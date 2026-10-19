@@ -51,6 +51,27 @@ const Ui = (() => {
     });
   }
 
+  /**
+   * Non-blocking toast (replaces native alert()). kind: 'info' | 'error' | 'success'.
+   * Errors use role="alert" (announced immediately); others role="status".
+   */
+  function notify(message, kind = 'info') {
+    let region = document.getElementById('toast-region');
+    if (!region) {
+      region = Dom.el('div', { id: 'toast-region', class: 'toast-region' });
+      document.body.appendChild(region);
+    }
+    const closeBtn = Dom.el('button', { type: 'button', class: 'toast-close', 'aria-label': 'Dismiss', text: '×' });
+    const toast = Dom.el('div', { class: `toast toast-${kind}`, role: kind === 'error' ? 'alert' : 'status' }, [
+      Dom.el('span', { class: 'toast-msg', text: String(message) }),
+      closeBtn,
+    ]);
+    const remove = () => toast.remove();
+    closeBtn.addEventListener('click', remove);
+    region.appendChild(toast);
+    setTimeout(remove, kind === 'error' ? 10000 : 5000);
+  }
+
   function statusBadge(status) {
     const s = String(status || '');
     return Dom.el('span', { class: `badge badge-sm badge-${s.toLowerCase()}`, text: s.charAt(0) + s.slice(1).toLowerCase() });
@@ -209,7 +230,40 @@ const Ui = (() => {
   }
 
   return {
-    confirm, statusBadge, visibilityBadge, couponStateBadge, paymentStatusBadge,
+    confirm, notify, statusBadge, visibilityBadge, couponStateBadge, paymentStatusBadge,
     leadStatusBadge, ENQUIRY_TYPE_LABELS, messageForError, copyToClipboard,
   };
+})();
+
+/**
+ * Sidebar nav scroll affordance (tablet/mobile only).
+ *
+ * Below 1024px the sidebar becomes a single horizontally-scrolling row of
+ * 13+ nav links (see base.css @media (max-width: 1024px) .sidebar nav),
+ * with no native scrollbar and no other signal that most of the nav sits
+ * off-screen. base.css always draws a right-edge shadow by default (the
+ * correct state before the first scroll ever happens); this script's job
+ * is to keep that in sync as the visitor actually scrolls — fading in a
+ * LEFT-edge shadow once scrolled away from the start, and dropping the
+ * right-edge shadow once scrolled all the way to the end — by toggling
+ * .sidebar-nav-at-start / .sidebar-nav-at-end on .sidebar, which base.css
+ * reads. Purely cosmetic, runs on every admin page (no auth/data
+ * involved), so it's safe to run unconditionally and before the
+ * auth-gated page scripts settle.
+ */
+(function initSidebarNavScrollHints() {
+  const nav = document.querySelector('.sidebar nav');
+  if (!nav) return;
+
+  function update() {
+    const maxScroll = nav.scrollWidth - nav.clientWidth;
+    const atStart = nav.scrollLeft <= 2;
+    const atEnd = maxScroll <= 2 || nav.scrollLeft >= maxScroll - 2;
+    nav.parentElement.classList.toggle('sidebar-nav-at-start', atStart);
+    nav.parentElement.classList.toggle('sidebar-nav-at-end', atEnd);
+  }
+
+  nav.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
 })();

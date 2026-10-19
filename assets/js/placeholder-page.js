@@ -25,8 +25,7 @@
   // ── 1. Auth guard ──────────────────────────────────────────────────────────
   const admin = await Auth.requireAuth();
   document.documentElement.classList.remove('auth-pending');
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   // ── 2. Sign-out ────────────────────────────────────────────────────────────
   const logoutBtn = document.getElementById('logout-btn');
@@ -303,8 +302,11 @@
 
       function openPreviewModal(embedUrl) {
         Dom.clear(previewContainer);
+        const safeEmbed = Dom.safeHttpsUrl(embedUrl);
+        if (!safeEmbed) { Ui.notify('Could not load preview: invalid video URL.', 'error'); return; }
         const iframe = Dom.el('iframe', {
-          src: embedUrl,
+          src: safeEmbed,
+          referrerpolicy: 'strict-origin-when-cross-origin',
           allow: 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',
           allowfullscreen: '',
           title: `${initial.label} preview`,

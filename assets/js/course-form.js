@@ -23,8 +23,7 @@
 (async function initCourseForm() {
   const admin = await Auth.requireAuth();
   document.documentElement.classList.remove('auth-pending');
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   const $ = (id) => document.getElementById(id);
   const form = $('course-form');
@@ -380,7 +379,7 @@
   function adoptCourse(c) {
     course = c;
     $('page-title').textContent = c.title;
-    document.title = `${c.title} — The Night Club Super Admin`;
+    document.title = `${c.title} — The Knight Club Super Admin`;
     fillForm(c);
     renderPublishing(c);
     snapshot = snapshotOf();

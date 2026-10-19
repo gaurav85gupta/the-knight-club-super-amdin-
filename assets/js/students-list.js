@@ -19,8 +19,7 @@
 (async function initStudentList() {
   const admin = await Auth.requireAuth();
   document.documentElement.classList.remove('auth-pending');
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   const logoutBtn = document.getElementById('logout-btn');
   logoutBtn.addEventListener('click', async () => {

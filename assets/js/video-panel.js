@@ -280,8 +280,10 @@ const VideoPanel = (() => {
     // ------------------------------------------------------------------ preview modal
     function openPreview(embedUrl) {
       const previously = document.activeElement;
+      const safeEmbed = Dom.safeHttpsUrl(embedUrl);
+      if (!safeEmbed) { say('error', 'Could not load preview: invalid video URL.'); return; }
       const iframe = Dom.el('iframe', {
-        src: embedUrl,
+        src: safeEmbed,
         title: 'Lesson video preview',
         allow: 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen',
         allowfullscreen: true,

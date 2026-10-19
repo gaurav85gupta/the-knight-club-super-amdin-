@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THE NIGHT CLUB — Design Tokens (Super Admin)
+   THE KNIGHT CLUB — Design Tokens (Super Admin)
    Theme: light-dominant cinematic SaaS — clean pale/white surfaces, with a
    purple / electric-blue / soft-pink accent system used for gradients,
    active states and restrained ambient background glows. NOT a dark theme:
@@ -96,8 +96,8 @@
 
   /* ---- Gradients: explicit reusable tokens ---- */
   /* Primary CTA gradient — buttons, selected nav items, progress fills. */
-  --gradient-primary: linear-gradient(135deg, var(--color-purple) 0%, var(--color-blue-electric) 100%);
-  --gradient-primary-hover: linear-gradient(135deg, var(--color-violet-deep) 0%, var(--color-blue-600) 100%);
+  --gradient-primary: linear-gradient(135deg, var(--color-purple) 0%, var(--color-blue-600) 100%); /* blue-600: keeps white text >= 4.5:1 */
+  --gradient-primary-hover: linear-gradient(135deg, var(--color-violet-deep) 0%, var(--color-blue-700) 100%);
   /* Featured-card gradient — a few highlighted dashboard stat cards. */
   --gradient-feature: linear-gradient(135deg, var(--color-violet-deep) 0%, var(--color-purple) 55%, var(--color-pink-soft) 100%);
   /* Sidebar active-item gradient. */
@@ -140,7 +140,11 @@
   --radius-xl: 20px;
   --radius-full: 999px;
 
-  /* ---- Typography ---- */
+  /* ---- Typography ----
+     Plus Jakarta Sans for headings/brand/nav/buttons (distinctive, geometric,
+     attractive display feel); Inter stays the workhorse body/table/form font
+     for maximum readability at small sizes. Both loaded in <head>. */
+  --font-family-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -148,6 +152,15 @@
   --font-size-xl: 1.5rem;
   --font-size-2xl: 2rem;
   --font-size-3xl: 2.75rem;
+
+  /* ---- Sidebar (dedicated dark-on-gradient surface, see reference UI) ---- */
+  --sidebar-bg: linear-gradient(180deg, #2a1868 0%, #1c1148 55%, #150d38 100%);
+  --sidebar-text: rgba(255, 255, 255, 0.72);
+  --sidebar-text-strong: #ffffff;
+  --sidebar-text-faint: rgba(255, 255, 255, 0.45);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  --sidebar-active-bg: rgba(255, 255, 255, 0.14);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
 
   /* ---- Motion ---- */
   --duration-fast: 0.15s;
@@ -158,5 +171,27 @@
 
   /* ---- Layout ---- */
   --max-width: 1200px;
-  --sidebar-width: 256px;
+  --sidebar-width: 264px;
+
+  /* ---- Breakpoints (reference values — see note below) ----
+     Single source of truth for the app's 3-tier responsive system:
+       mobile:  up to 640px  (phones)
+       tablet:  641–1024px   (large phones landscape, tablets, small laptops)
+       desktop: 1025px+      (laptops, monitors)
+     CSS custom properties cannot be used inside @media conditions, so these
+     are documentation + the values JS should read (see main.js /
+     Breakpoints helper) — every @media rule in this codebase must use the
+     literal px values below, not an arbitrary number. Do not introduce a
+     new breakpoint number anywhere else; add a tier here first. */
+  --bp-mobile-max: 640px;    /* @media (max-width: 640px) */
+  --bp-tablet-min: 641px;    /* @media (min-width: 641px) */
+  --bp-tablet-max: 1024px;   /* @media (max-width: 1024px) */
+  --bp-desktop-min: 1025px;  /* @media (min-width: 1025px) */
+
+  /* Narrow-phone sub-tier: for 2-up grids (stat cards, totals) built on
+     an 11rem/10rem minmax() that still doesn't fit 2-up on the smallest
+     phones (2 × ~176px + gap + shell padding > 320-390px viewport). Use
+     this sparingly — only for auto-fit grids that need one more step down
+     than the standard mobile tier. */
+  --bp-mobile-sm-max: 480px; /* @media (max-width: 480px) */
 }

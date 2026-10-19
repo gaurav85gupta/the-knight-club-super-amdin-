@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THE NIGHT CLUB — Super Admin: 1% Club Management (Phase 38)
+   THE KNIGHT CLUB — Super Admin: 1% Club Management (Phase 38)
    Tokens only (tokens.css). Reuses .card, .field, .form-row, .btn, .badge,
    .alert, .state-box, .modal from courses.css and base.css.
    ========================================================================== */
@@ -284,7 +284,7 @@
 }
 
 /* ---- Responsive ---- */
-@media (max-width: 720px) {
+@media (max-width: 640px) {
   .availability-row,
   .form-row {
     grid-template-columns: 1fr;
@@ -592,7 +592,7 @@
 }
 
 /* ---- Responsive ---- */
-@media (max-width: 720px) {
+@media (max-width: 640px) {
   .media-slot-preview { max-width: 100%; }
   .video-thumb { max-width: 100%; }
   .media-modal-inner { width: calc(100vw - 1rem); }

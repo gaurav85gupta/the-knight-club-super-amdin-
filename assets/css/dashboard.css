@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THE NIGHT CLUB — Super Admin Dashboard (Phase 24)
+   THE KNIGHT CLUB — Super Admin Dashboard (Phase 24)
    Reuses .card, .table, .state-box, .badge, .stat-card from
    base.css/courses.css/coupons.css — this file only adds the
    dashboard-specific grid/list layout.
@@ -14,7 +14,9 @@
 
 .dashboard-sections {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  /* 2-up only when each card can be >= 32rem wide; otherwise stack. Prevents
+     5-column tables being squeezed into ~450px cards on laptop screens. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 32rem), 1fr));
   gap: var(--space-6);
 }
 
@@ -37,6 +39,7 @@
 .dashboard-section-title h2 {
   margin: 0;
   font-size: var(--font-size-lg);
+  font-family: var(--font-family-display);
 }
 
 .dashboard-section-title a {
@@ -100,18 +103,23 @@
   margin-top: var(--space-2);
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   .dashboard-sections {
     grid-template-columns: 1fr;
   }
 }
 
-/* Stat cards: 11rem minimum is too wide to fit 2-up on small phones
-   (2 x 176px + gap + shell padding overflows a 320-390px viewport) —
-   collapse to a single column below 480px so cards stay full-width
-   and readable instead of clipping off-screen. */
+/* Narrow-phone sub-tier (--bp-mobile-sm-max, see tokens.css): 11rem minimum
+   is too wide to fit 2-up on small phones (2 x 176px + gap + shell padding
+   overflows a 320-390px viewport) — collapse to a single column so cards
+   stay full-width and readable instead of clipping off-screen. */
 @media (max-width: 480px) {
   .dashboard-stats-grid {
     grid-template-columns: 1fr;
   }
 }
+
+/* Short, scannable values (amount, status, date) never wrap onto 2 lines;
+   only the first two columns (names / course titles) may wrap. */
+.dashboard-section .table th:nth-child(n+3),
+.dashboard-section .table td:nth-child(n+3) { white-space: nowrap; }

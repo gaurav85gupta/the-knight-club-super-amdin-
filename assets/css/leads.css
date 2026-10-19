@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THE NIGHT CLUB — Super Admin: Leads / Inquiry Management (Phase L4)
+   THE KNIGHT CLUB — Super Admin: Leads / Inquiry Management (Phase L4)
    Tokens only (tokens.css); reuses .filters/.table/.state-box/.pager/.card/
    .badge/.detail-grid/.field/.form-row/.modal from courses.css/coupons.css/
    orders.css/base.css. No new design system introduced.
@@ -8,8 +8,9 @@
 /* ---- List filters (search + status + enquiry type + reset, same shape as
    orders.css .filters-orders / coupons.css .filters-coupons) ---- */
 .filters.filters-leads { grid-template-columns: 2fr repeat(2, 1fr) auto; align-items: center; }
-@media (max-width: 1100px) { .filters.filters-leads { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 720px) { .filters.filters-leads { grid-template-columns: 1fr; } }
+@media (max-width: 1024px) { .filters.filters-leads { grid-template-columns: 1fr 1fr; } }
+/* Collapse to 1 column on mobile is already handled by base.css's generic
+   .filters rule at 640px (see "RESPONSIVE ARCHITECTURE" in base.css). */
 
 /* ---- Lead status badges — the REAL ContactMessage.status enum (new /
    in-progress / resolved / spam), never an invented UI-only status. ---- */
@@ -41,6 +42,6 @@
 
 .lead-save-row { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-4); }
 
-@media (max-width: 720px) {
+@media (max-width: 640px) {
   .detail-grid { grid-template-columns: 1fr; }
 }

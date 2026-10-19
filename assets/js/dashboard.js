@@ -26,8 +26,7 @@
 (async function initDashboard() {
   const admin = await Auth.requireAuth();
   document.documentElement.classList.remove('auth-pending');
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   const logoutBtn = document.getElementById('logout-btn');
   let signingOut = false;
@@ -215,12 +214,21 @@
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
-  /** Renders an event's already-allow-listed `meta` as "key: value, ...". */
+  /**
+   * Renders an event's already-allow-listed `meta` as "key: value, ...".
+   * Raw internal identifiers are noise for an operator (and session ids
+   * should not be displayed at all), so: sessionId is hidden, and any other
+   * *Id value is shortened to its last 6 characters.
+   */
   function metaText(meta) {
     if (!meta || typeof meta !== 'object') return '';
     const parts = Object.entries(meta)
-      .filter(([, v]) => v !== undefined && v !== null && v !== '')
-      .map(([k, v]) => `${k}: ${v}`);
+      .filter(([k, v]) => v !== undefined && v !== null && v !== '' && k.toLowerCase() !== 'sessionid')
+      .map(([k, v]) => {
+        const isId = /id$/i.test(k) && typeof v === 'string' && v.length > 8;
+        const label = k.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase();
+        return `${label}: ${isId ? '…' + v.slice(-6) : v}`;
+      });
     return parts.join(' · ');
   }
 

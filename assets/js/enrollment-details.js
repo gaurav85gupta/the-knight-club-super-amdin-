@@ -19,8 +19,7 @@
 (async function initEnrollmentDetails() {
   const admin = await Auth.requireAuth();
   document.documentElement.classList.remove('auth-pending');
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   const $ = (id) => document.getElementById(id);
   const alertEl = $('page-alert');
@@ -51,7 +50,7 @@
 
   function renderEnrollment(e) {
     $('page-title').textContent = `Enrollment ${e.id}`;
-    document.title = `Enrollment ${e.id} — The Night Club Super Admin`;
+    document.title = `Enrollment ${e.id} — The Knight Club Super Admin`;
 
     // Enrollment
     $('d-id').textContent = e.id;

@@ -76,6 +76,16 @@ const Dom = (() => {
       : d.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
 
+  /** Returns the URL only if it is a well-formed https:// URL, else ''. */
+  function safeHttpsUrl(value) {
+    try {
+      const u = new URL(String(value || ''));
+      return u.protocol === 'https:' ? u.href : '';
+    } catch {
+      return '';
+    }
+  }
+
   /** Debounce for the search box (one request after the user pauses). */
   function debounce(fn, ms) {
     let t;
@@ -85,5 +95,5 @@ const Dom = (() => {
     };
   }
 
-  return { el, clear, paiseToRupees, rupeesToPaise, formatPrice, formatDate, formatDateTime, debounce };
+  return { el, clear, paiseToRupees, rupeesToPaise, formatPrice, formatDate, formatDateTime, safeHttpsUrl, debounce };
 })();

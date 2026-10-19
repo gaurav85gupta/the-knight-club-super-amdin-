@@ -18,8 +18,7 @@
   // Reveal the shell only now that the server has confirmed the session.
   document.documentElement.classList.remove('auth-pending');
 
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   // ---- Sign out -----------------------------------------------------------
   const logoutBtn = document.getElementById('logout-btn');

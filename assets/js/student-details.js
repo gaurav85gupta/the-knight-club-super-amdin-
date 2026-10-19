@@ -25,8 +25,7 @@
 (async function initStudentDetails() {
   const admin = await Auth.requireAuth();
   document.documentElement.classList.remove('auth-pending');
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   const $ = (id) => document.getElementById(id);
   const alertEl = $('page-alert');
@@ -75,7 +74,7 @@
   function renderStudent(s) {
     currentStudent = s;
     $('page-title').textContent = s.fullName;
-    document.title = `${s.fullName} — The Night Club Super Admin`;
+    document.title = `${s.fullName} — The Knight Club Super Admin`;
 
     $('d-name').textContent = s.fullName;
     $('d-userid').textContent = s.userId;

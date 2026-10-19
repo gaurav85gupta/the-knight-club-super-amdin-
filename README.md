@@ -1,4 +1,4 @@
-# The Night Club — Super Admin
+# The Knight Club — Super Admin
 
 The internal admin dashboard for managing courses, students, orders, and
 platform operations. Framework-free by design: **HTML5 + CSS3 + Vanilla

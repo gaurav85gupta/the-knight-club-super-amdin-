@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THE NIGHT CLUB — Super Admin: Order & Payment Management (Phase 20)
+   THE KNIGHT CLUB — Super Admin: Order & Payment Management (Phase 20)
    Tokens only (tokens.css); reuses .filters/.table/.state-box/.pager/.card/
    .badge/.detail-grid/.stat-grid from courses.css/coupons.css/base.css.
    ========================================================================== */
@@ -7,8 +7,9 @@
 /* ---- List filters (search + status + course + date + sort, same shape as
    coupons.css .filters-coupons) ---- */
 .filters.filters-orders { grid-template-columns: 2fr repeat(3, 1fr) auto; align-items: center; }
-@media (max-width: 1100px) { .filters.filters-orders { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 720px) { .filters.filters-orders { grid-template-columns: 1fr; } }
+@media (max-width: 1024px) { .filters.filters-orders { grid-template-columns: 1fr 1fr; } }
+/* Collapse to 1 column on mobile is already handled by base.css's generic
+   .filters rule at 640px (see "RESPONSIVE ARCHITECTURE" in base.css). */
 
 /* ---- Payment status badges — the REAL Payment.status enum, never an
    invented UI-only status (spec Step 4-5, 11, 20). ---- */
@@ -36,7 +37,7 @@
 
 .failure-box { background: var(--color-error-bg); color: var(--color-error-text); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); font-size: var(--font-size-sm); }
 
-@media (max-width: 720px) {
+@media (max-width: 640px) {
   .detail-grid { grid-template-columns: 1fr; }
 }
 

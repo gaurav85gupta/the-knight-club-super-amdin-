@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THE NIGHT CLUB — Super Admin: Student Management (Phase 21)
+   THE KNIGHT CLUB — Super Admin: Student Management (Phase 21)
    Tokens only (tokens.css); reuses .filters/.table/.state-box/.pager/.card/
    .badge/.detail-grid/.cell-title/.cell-sub/.order-id/.order-amount* from
    courses.css/coupons.css/orders.css/base.css.
@@ -7,8 +7,9 @@
 
 /* ---- List filters (search + status + sort) ---- */
 .filters.filters-students { grid-template-columns: 2fr 1fr auto; align-items: center; }
-@media (max-width: 900px) { .filters.filters-students { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 720px) { .filters.filters-students { grid-template-columns: 1fr; } }
+@media (max-width: 1024px) { .filters.filters-students { grid-template-columns: 1fr 1fr; } }
+/* Collapse to 1 column on mobile is already handled by base.css's generic
+   .filters rule at 640px (see "RESPONSIVE ARCHITECTURE" in base.css). */
 
 /* ---- Account status badges — the REAL Student.status enum (ACTIVE reuses
    the existing .badge-active from courses.css; SUSPENDED is new here). ---- */

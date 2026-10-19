@@ -11,8 +11,7 @@
 (async function initCouponDetails() {
   const admin = await Auth.requireAuth();
   document.documentElement.classList.remove('auth-pending');
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   const $ = (id) => document.getElementById(id);
   const alertEl = $('page-alert');
@@ -54,7 +53,7 @@
 
   function renderCoupon(c) {
     $('page-title').textContent = c.code;
-    document.title = `${c.code} — The Night Club Super Admin`;
+    document.title = `${c.code} — The Knight Club Super Admin`;
     $('edit-link').href = `coupon-form.html?id=${encodeURIComponent(c.id)}`;
 
     $('d-code').textContent = c.code;

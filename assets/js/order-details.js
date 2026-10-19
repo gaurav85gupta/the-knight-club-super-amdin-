@@ -18,8 +18,7 @@
 (async function initOrderDetails() {
   const admin = await Auth.requireAuth();
   document.documentElement.classList.remove('auth-pending');
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   const $ = (id) => document.getElementById(id);
   const alertEl = $('page-alert');
@@ -53,7 +52,7 @@
 
   function renderOrder(o) {
     $('page-title').textContent = `Order ${o.id}`;
-    document.title = `Order ${o.id} — The Night Club Super Admin`;
+    document.title = `Order ${o.id} — The Knight Club Super Admin`;
 
     // Order information
     $('d-id').textContent = o.id;

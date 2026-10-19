@@ -65,8 +65,7 @@
 
   const admin = await Auth.requireAuth(); // redirects if not signed in
   document.documentElement.classList.remove('auth-pending');
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   document.getElementById('logout-btn').addEventListener('click', async () => {
     document.getElementById('logout-btn').disabled = true;
@@ -765,7 +764,7 @@
 
   async function saveContent() {
     var id = planId();
-    if (!id) { alert('No active plan. Please save the plan first.'); return; }
+    if (!id) { Ui.notify('No active plan. Please save the plan first.', 'error'); return; }
     if (!saveContentBtn) return;
 
     var origLabel = saveContentBtn.textContent;
@@ -787,7 +786,7 @@
       saveContentBtn.textContent = origLabel;
       saveContentBtn.disabled = false;
       if (typeof Auth !== 'undefined' && Auth.handleSessionError && Auth.handleSessionError(err)) return;
-      alert('Failed to save content: ' + ((err && err.message) || 'Unknown error'));
+      Ui.notify('Failed to save content: ' + ((err && err.message) || 'Unknown error'), 'error');
     }
   }
 
@@ -827,7 +826,7 @@
   async function handleImageRemove(slot, previewEl, removeBtn, statusEl) {
     var id = planId();
     if (!id) return;
-    if (!confirm('Remove this image? The slot will show the default placeholder.')) return;
+    if (!(await Ui.confirm({ title: 'Remove this image?', message: 'The slot will show the default placeholder.', confirmLabel: 'Remove', danger: true }))) return;
     clearStatus(statusEl);
     try {
       await MembershipApi.removeImage(id, slot);
@@ -992,15 +991,21 @@
       var embedUrl = result && result.data && result.data.embedUrl;
       if (!embedUrl) throw new Error('No embed URL returned.');
       if (videoPreviewContainer) {
+        // Only ever embed an https:// URL, never javascript:/data:/http:.
+        var parsed;
+        try { parsed = new URL(embedUrl); } catch (e) { parsed = null; }
+        if (!parsed || parsed.protocol !== 'https:') throw new Error('Invalid preview URL.');
         var iframe = document.createElement('iframe');
-        iframe.src = embedUrl;
+        iframe.src = parsed.href;
+        iframe.title = 'Intro video preview';
         iframe.allow = 'autoplay; fullscreen';
         iframe.allowFullscreen = true;
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
         videoPreviewContainer.appendChild(iframe);
       }
     } catch (err) {
       if (videoModal) videoModal.hidden = true;
-      alert('Could not load preview: ' + ((err && err.message) || 'Unknown error'));
+      Ui.notify('Could not load preview: ' + ((err && err.message) || 'Unknown error'), 'error');
     }
   }
 
@@ -1016,7 +1021,7 @@
   async function removeVideo() {
     var id = planId();
     if (!id) return;
-    if (!confirm('Remove the intro video configuration? The public page will show a placeholder until a new video is uploaded. This does not delete the video from Bunny CDN.')) return;
+    if (!(await Ui.confirm({ title: 'Remove the intro video?', message: 'The public page will show a placeholder until a new video is uploaded. This does not delete the video from Bunny CDN.', confirmLabel: 'Remove', danger: true }))) return;
     clearStatus(videoStatusEl);
     if (typeof VideoPoller !== 'undefined') VideoPoller.stop('removed');
     try {

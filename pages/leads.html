@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Leads — The Night Club Super Admin</title>
+  <title>Leads — The Knight Club Super Admin</title>
   <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/tokens.css" />
   <link rel="stylesheet" href="../assets/css/base.css" />
   <link rel="stylesheet" href="../assets/css/auth.css" />
@@ -17,9 +20,10 @@
   <noscript><style>html.auth-pending body { visibility: visible; }</style></noscript>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="brand">The <span>Night Club</span></div>
+      <div class="brand">The <span>Knight Club</span></div>
       <nav aria-label="Admin modules">
         <a href="../index.html">Dashboard</a>
         <a href="courses.html">Courses</a>
@@ -38,12 +42,11 @@
       </nav>
     </aside>
 
-    <main class="main-content">
+    <main class="main-content" id="main-content" tabindex="-1">
       <div class="topbar">
         <span></span>
         <div class="topbar-right">
           <span id="admin-identity" class="admin-identity"></span>
-          <span id="admin-role" class="badge badge-role"></span>
           <button type="button" id="logout-btn" class="btn btn-outline btn-sm">Sign out</button>
         </div>
       </div>

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THE NIGHT CLUB — Super Admin: Analytics & Intelligence (Phase 25)
+   THE KNIGHT CLUB — Super Admin: Analytics & Intelligence (Phase 25)
    Tokens only (tokens.css); reuses .card/.table/.state-box/.filters/
    .stat-card/.badge/.btn/.input from base.css/courses.css/coupons.css.
    This file only adds: section tabs, chart containers, and the simple
@@ -91,6 +91,17 @@
 .progress-distribution-bar-track { background: var(--color-surface-alt); border-radius: var(--radius-full); height: 0.6rem; overflow: hidden; }
 .progress-distribution-bar-fill { background: var(--gradient-primary); height: 100%; }
 
-@media (max-width: 720px) {
+/* Collapse to 1 column on mobile is already handled by base.css's generic
+   .filters rule at 640px (see "RESPONSIVE ARCHITECTURE" in base.css); this
+   rule stays for clarity/specificity but matches the same breakpoint. */
+@media (max-width: 640px) {
   .filters.filters-analytics { grid-template-columns: 1fr; }
+}
+
+/* Chart area needs its own horizontal scroll affordance on mobile since
+   .chart-svg has a 420px min-width floor (readability for axis labels) —
+   .chart-wrap already provides overflow-x: auto above, this just tightens
+   card padding so the scrollbar/edge doesn't feel cramped on a phone. */
+@media (max-width: 640px) {
+  .analytics-card { padding: var(--space-4); }
 }

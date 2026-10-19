@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THE NIGHT CLUB — Super Admin: shared components + login page
+   THE KNIGHT CLUB — Super Admin: shared components + login page
    This file is the de-facto shared component stylesheet (loaded on every
    page): buttons, form controls, alerts and the guarded-shell/topbar rules
    live here, plus the login-page-specific layout at the bottom. Uses ONLY
@@ -159,7 +159,8 @@
   align-items: center;
   justify-content: center;
   padding: 0.75rem 1.25rem;
-  font: inherit;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-sm);
   font-weight: 600;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
@@ -231,26 +232,52 @@
 html.auth-pending body { visibility: hidden; }
 
 /* Sidebar entries for modules that ship in later phases: visibly inert, and
-   not focusable, so nothing pretends to work that does not exist yet. */
+   not focusable, so nothing pretends to work that does not exist yet.
+   (Color comes from base.css's dark-sidebar tokens; only behavior here.) */
 .sidebar nav .nav-disabled {
-  color: var(--color-text-faint);
   cursor: not-allowed;
   user-select: none;
 }
 .topbar-right { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
-.admin-identity { color: var(--color-text-muted); font-size: var(--font-size-sm); }
-.badge-role {
-  background: var(--color-accent-50);
-  color: var(--color-accent-700);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-size: 0.7rem;
+
+/* Admin identity: a compact name chip with a small gradient avatar dot —
+   production-clean, no raw admin ID or role-string clutter in the topbar
+   (that detail lives on the Settings page, not repeated on every screen). */
+.admin-identity {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+.admin-identity::before {
+  content: "";
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+}
+
+.admin-identity:empty { display: none; }
 
 @media (min-width: 640px) {
   .auth-main { padding-top: var(--space-8); }
   .auth-card { padding: var(--space-8); }
 }
+/* Extreme-narrow tier (iPhone SE class, ~320-375px) — not part of the app's
+   standard mobile/tablet/desktop breakpoints (see tokens.css --bp-*), only
+   used here to shave card padding on the smallest real devices. */
 @media (max-width: 380px) {
   .auth-card { padding: var(--space-4); }
 }

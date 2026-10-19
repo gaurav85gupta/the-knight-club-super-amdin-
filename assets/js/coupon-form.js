@@ -30,8 +30,7 @@
 (async function initCouponForm() {
   const admin = await Auth.requireAuth();
   document.documentElement.classList.remove('auth-pending');
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   const $ = (id) => document.getElementById(id);
   const form = $('coupon-form');
@@ -375,7 +374,7 @@
   function adoptCoupon(c) {
     coupon = c;
     $('page-title').textContent = c.code;
-    document.title = `${c.code} — The Night Club Super Admin`;
+    document.title = `${c.code} — The Knight Club Super Admin`;
     fillForm(c);
     renderStatusPanel(c);
     snapshot = snapshotOf();

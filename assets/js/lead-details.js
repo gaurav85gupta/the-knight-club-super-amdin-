@@ -21,8 +21,7 @@
 (async function initLeadDetails() {
   const admin = await Auth.requireAuth();
   document.documentElement.classList.remove('auth-pending');
-  document.getElementById('admin-identity').textContent = `${admin.name} (${admin.adminId})`;
-  document.getElementById('admin-role').textContent = String(admin.role || '').replace('_', ' ');
+  document.getElementById('admin-identity').textContent = admin.name;
 
   const $ = (id) => document.getElementById(id);
   const alertEl = $('page-alert');
@@ -90,7 +89,7 @@
   function renderLead(l) {
     currentLead = l;
     $('page-title').textContent = l.subject;
-    document.title = `${l.subject} — The Night Club Super Admin`;
+    document.title = `${l.subject} — The Knight Club Super Admin`;
 
     $('d-name').textContent = l.name;
     $('d-email').textContent = l.email;

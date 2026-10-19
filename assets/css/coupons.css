@@ -1,17 +1,19 @@
 /* ==========================================================================
-   THE NIGHT CLUB — Super Admin: Coupon management (Phase 19)
+   THE KNIGHT CLUB — Super Admin: Coupon management (Phase 19)
    Tokens only (tokens.css); reuses .filters/.table/.state-box/.pager/.card/
    .badge/.field/.form-grid/.form-row/.modal from courses.css and base.css.
    ========================================================================== */
 
 /* ---- List filters (search + 3 selects + reset, same shape as courses.css .filters) ---- */
 .filters.filters-coupons { grid-template-columns: 2fr repeat(3, 1fr) auto; align-items: center; }
-@media (max-width: 1100px) { .filters.filters-coupons { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 720px) { .filters.filters-coupons { grid-template-columns: 1fr; } }
+@media (max-width: 1024px) { .filters.filters-coupons { grid-template-columns: 1fr 1fr; } }
+/* Collapse to 1 column on mobile is already handled by base.css's generic
+   .filters rule at 640px (see "RESPONSIVE ARCHITECTURE" in base.css). */
 
-/* 11rem minimum is too wide to fit 2-up on small phones (2 x 176px + gap +
-   shell padding overflows a 320-390px viewport) — collapse to a single
-   column below 480px so stat cards stay full-width instead of clipping. */
+/* Narrow-phone sub-tier (--bp-mobile-sm-max, see tokens.css): 11rem minimum
+   is too wide to fit 2-up on small phones (2 x 176px + gap + shell padding
+   overflows a 320-390px viewport) — collapse to a single column so stat
+   cards stay full-width instead of clipping. */
 @media (max-width: 480px) {
   .stat-grid { grid-template-columns: 1fr; }
 }
@@ -50,8 +52,8 @@
   height: 3px;
   background: var(--gradient-primary);
 }
-.stat-card .stat-label { font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: var(--space-2); }
-.stat-card .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--color-text); }
+.stat-card .stat-label { font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: var(--space-2); font-weight: 600; }
+.stat-card .stat-value { font-family: var(--font-family-display); font-size: 1.625rem; font-weight: 800; color: var(--color-text); letter-spacing: -0.01em; }
 .stat-card .stat-sub { font-size: 0.8125rem; color: var(--color-text-muted); margin-top: var(--space-1); }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {

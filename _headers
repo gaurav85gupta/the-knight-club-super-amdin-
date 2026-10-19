@@ -1,0 +1,9 @@
+# Netlify / Cloudflare Pages security headers (ignored by other hosts).
+# Safe subset only. A full Content-Security-Policy needs your Bunny/video
+# hostnames added first -- see AUDIT.md section "Recommended next steps".
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'
+  Referrer-Policy: same-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
