@@ -13,6 +13,16 @@
  *
  * SAFE RENDERING: DOM built with Dom.el / textContent only; the preview iframe
  * gets a URL that the backend signed for Bunny's own player host.
+ *
+ * BACKGROUND UPLOADS (Phase 8.2): the actual byte-sending is owned by
+ * UploadManager, not this panel. This panel starts a job and SUBSCRIBES to
+ * it; closing this panel (lesson editor closed, or a different lesson
+ * opened) no longer aborts the upload — UploadManager keeps it running, and
+ * the floating upload tray keeps showing its progress. If the admin reopens
+ * this same lesson later, the panel re-subscribes and picks up the job
+ * exactly where it is. This is also what lets several lessons upload at the
+ * same time: each lesson gets its own UploadManager job and its own
+ * VideoPoller instance, so one lesson's progress never interrupts another's.
  */
 
 const VideoPanel = (() => {
@@ -35,10 +45,11 @@ const VideoPanel = (() => {
     let data = null; // last overview from the backend
     let destroyed = false;
     let busy = false; // an API action is in flight (disables buttons: spec 39)
-    let uploadCtl = null; // { abort() } while a TUS upload runs
-    let uploadState = null; // { videoRecordId, pct } while THIS tab is uploading
+    let uploadState = null; // { videoRecordId, pct } mirrors UploadManager's job for THIS lesson
+    let unsubscribeUpload = null; // UploadManager.subscribe() teardown
     let replaceIntent = false; // chosen file is a replacement
     let note = null; // { kind, text }
+    const poller = VideoPoller.create(); // this lesson's own poller (Phase 8.2: no longer page-shared)
 
     // ------------------------------------------------------------------ helpers
     const fmtBytes = (n) => {
@@ -77,7 +88,7 @@ const VideoPanel = (() => {
       // Keep polling only while something is in flight.
       if (destroyed) return;
       if (needsPolling(data)) startPolling();
-      else VideoPoller.stop('idle');
+      else poller.stop('idle');
     }
 
     // ------------------------------------------------------------------ data
@@ -106,8 +117,8 @@ const VideoPanel = (() => {
     const needsPolling = (d) => candidateInFlight(d) && !uploadState && ['UPLOADING', 'UPLOADED', 'PROCESSING'].includes(d.candidate.status);
 
     function startPolling() {
-      if (VideoPoller.isRunning() && !destroyed) return;
-      VideoPoller.start({
+      if (poller.isRunning() && !destroyed) return;
+      poller.start({
         fetch: () => VideoApi.status(courseId, moduleId, lessonId),
         onUpdate: (d, err) => {
           if (destroyed) return;
@@ -163,7 +174,13 @@ const VideoPanel = (() => {
       beginUpload(file, replaceIntent);
     });
 
-    /** Init on our backend (small JSON) -> send bytes straight to Bunny -> tell the backend. */
+    /**
+     * Init on our backend (small JSON) -> hand the file to UploadManager,
+     * which sends the bytes straight to Bunny IN THE BACKGROUND and tells the
+     * backend when it finishes. This panel only renders whatever UploadManager
+     * reports via onUploadUpdate; it no longer owns the TUS upload itself, so
+     * closing this panel does not touch the transfer.
+     */
     function beginUpload(file, replace) {
       guarded(async () => {
         if (!VideoUpload.isSupported()) throw new Error('unsupported');
@@ -175,54 +192,67 @@ const VideoPanel = (() => {
           replace,
         });
         const rec = init.video;
-        uploadState = { videoRecordId: rec.id, pct: 0, fileName: file.name, total: file.size };
-        // Re-fetch so the UI reflects the new candidate; then start sending.
+        // Re-fetch so the UI reflects the new candidate; then hand off to UploadManager.
         data = { ...(data || {}), candidate: rec, state: 'UPLOADING' };
         render();
 
-        uploadCtl = VideoUpload.start(file, init.upload, {
-          onProgress: (pct) => {
-            if (!uploadState) return;
-            uploadState.pct = pct;
-            paintProgress();
+        UploadManager.startJob(
+          {
+            courseId, moduleId, lessonId, lessonTitle: ctx.lessonTitle,
+            videoRecordId: rec.id, file, creds: init.upload,
           },
-          onSuccess: async () => {
-            uploadCtl = null;
-            const id = uploadState && uploadState.videoRecordId;
-            uploadState = null;
-            try {
-              await VideoApi.markUploaded(courseId, moduleId, lessonId, id);
-            } catch (e) {
+          {
+            onUploaded: (id) => VideoApi.markUploaded(courseId, moduleId, lessonId, id).catch(() => {
               /* non-fatal: the poller reconciles from Bunny either way */
-            }
-            say('info', 'Upload complete. Processing…');
-            await load();
-            startPolling();
-          },
-          onError: async (error, info) => {
-            uploadCtl = null;
-            const id = uploadState && uploadState.videoRecordId;
-            uploadState = null;
-            // 401/403 from Bunny = our signed authorization expired or was refused.
-            const reason = 'UPLOAD_FAILED';
-            try { if (id) await VideoApi.reportFailure(courseId, moduleId, lessonId, id, reason); } catch (e) { /* best effort */ }
-            say('error', info && (info.status === 401 || info.status === 403) ? 'The upload authorization expired. Please start the upload again.' : 'The upload failed. Your existing video (if any) is unchanged. You can try again.');
-            await load();
-          },
-        });
+            }),
+            onFailed: (id, reason) => VideoApi.reportFailure(courseId, moduleId, lessonId, id, reason).catch(() => {
+              /* best effort */
+            }),
+          }
+        );
+        // onUploadUpdate (subscribed below) drives all further rendering for this job.
       });
     }
 
     async function cancelUpload() {
-      if (!uploadState) return;
-      const id = uploadState.videoRecordId;
-      const ctl = uploadCtl;
-      uploadCtl = null;
-      uploadState = null;
-      if (ctl) await ctl.abort();
-      try { await VideoApi.reportFailure(courseId, moduleId, lessonId, id, 'UPLOAD_CANCELLED'); } catch (e) { /* best effort */ }
+      await UploadManager.cancel(courseId, moduleId, lessonId, {
+        onCancelled: (id) => VideoApi.reportFailure(courseId, moduleId, lessonId, id, 'UPLOAD_CANCELLED'),
+      });
       say('info', 'Upload cancelled.');
       await load();
+    }
+
+    // Mirrors UploadManager's job for this lesson into `uploadState` / progress UI.
+    // Fires immediately on subscribe, so reopening this lesson's editor while a
+    // background upload is still running shows it uploading right away instead
+    // of flashing "not uploaded" until the next overview load.
+    function onUploadUpdate(job) {
+      if (destroyed) return;
+      if (!job || job.status !== 'uploading') {
+        const wasUploading = Boolean(uploadState);
+        uploadState = null;
+        if (job && job.status === 'done') {
+          say('info', 'Upload complete. Processing…');
+          load().then(() => startPolling());
+        } else if (job && job.status === 'error') {
+          say('error', job.error || 'The upload failed. Your existing video (if any) is unchanged. You can try again.');
+          load();
+        } else if (wasUploading) {
+          // cancelled elsewhere, or job vanished — re-sync from the backend.
+          render();
+        }
+        return;
+      }
+      const hadBar = Boolean(progressEl) && uploadState && uploadState.videoRecordId === job.videoRecordId;
+      uploadState = { videoRecordId: job.videoRecordId, pct: job.pct, fileName: job.fileName, total: job.total };
+      // Cheap path once the progress bar already exists in the DOM for this
+      // same job (the common case — a % tick while the panel stays open):
+      // just repaint the bar's width. The FIRST update for a job (no bar
+      // yet — e.g. right after beginUpload(), or a freshly (re)opened panel
+      // that just learned it has an upload in progress) needs a full
+      // render() so renderCandidate() actually builds the progress bar.
+      if (hadBar) paintProgress();
+      else render();
     }
 
     async function discardPending() {
@@ -462,28 +492,31 @@ const VideoPanel = (() => {
       body.replaceChildren(frag);
     }
 
-    // Warn before leaving the page while THIS tab is sending bytes.
+    // Warn before leaving the PAGE (not just closing this modal) while any
+    // lesson is still sending bytes — background uploads are real network
+    // transfers that a page unload still kills.
     function onBeforeUnload(e) {
-      if (uploadState) { e.preventDefault(); e.returnValue = ''; }
+      if (UploadManager.hasAnyUploading()) { e.preventDefault(); e.returnValue = ''; }
     }
     window.addEventListener('beforeunload', onBeforeUnload);
 
+    // Background uploads (Phase 8.2): closing this panel must NOT cancel the
+    // upload — only an explicit "Cancel upload" click does that (see
+    // cancelUpload above). Destroying just stops watching: this lesson's own
+    // poller stops, and we unsubscribe from UploadManager so it stops
+    // pushing updates into a panel that's gone. The job itself, and the
+    // floating tray's view of it, keep going untouched.
     function destroy() {
       destroyed = true;
-      VideoPoller.stop('destroyed');
+      poller.stop('destroyed');
       window.removeEventListener('beforeunload', onBeforeUnload);
-      if (uploadCtl) { uploadCtl.abort(); uploadCtl = null; }
-      if (uploadState) {
-        // Tell the backend so the lesson is not left with a phantom "uploading" slot.
-        const id = uploadState.videoRecordId;
-        uploadState = null;
-        VideoApi.reportFailure(courseId, moduleId, lessonId, id, 'UPLOAD_CANCELLED').catch(() => {});
-      }
+      if (unsubscribeUpload) { unsubscribeUpload(); unsubscribeUpload = null; }
     }
 
+    unsubscribeUpload = UploadManager.subscribe(courseId, moduleId, lessonId, onUploadUpdate);
     render();
     load();
-    return { element: root, destroy, isUploading: () => Boolean(uploadState) };
+    return { element: root, destroy, isUploading: () => UploadManager.isUploading(courseId, moduleId, lessonId) };
   }
 
   return { create };

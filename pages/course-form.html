@@ -240,8 +240,13 @@
   <script src="../assets/js/video-api.js"></script>
   <script src="../assets/js/video-upload.js"></script>
   <script src="../assets/js/video-poller.js"></script>
+  <!-- Phase 8.2: background uploads — lets several lessons upload video at
+       once, independent of which lesson editor (if any) is open. -->
+  <script src="../assets/js/upload-manager.js"></script>
+  <script src="../assets/js/upload-tray.js"></script>
   <script src="../assets/js/video-panel.js"></script>
   <script src="../assets/js/curriculum.js"></script>
   <script src="../assets/js/course-form.js"></script>
+  <script>UploadTray.mount();</script>
 </body>
 </html>

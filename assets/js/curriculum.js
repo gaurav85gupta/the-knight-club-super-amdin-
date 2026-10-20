@@ -9,6 +9,15 @@
  * owns everything about a lesson's video. This file only mounts it and
  * refreshes the tree when the video changes; it never talks to Bunny.
  *
+ * BACKGROUND UPLOADS (Phase 8.2): the actual upload now lives in
+ * UploadManager, outside any one VideoPanel/modal. Closing this lesson
+ * editor — to edit another lesson, or to add a new one — no longer cancels
+ * an in-flight video upload; it keeps running, shown in the floating upload
+ * tray (upload-tray.js) that course-form.html mounts once for the whole
+ * page. That's what makes uploading several lessons' videos "at once"
+ * possible: each lesson editor only ever drives one video at a time, but the
+ * uploads it starts keep going after you move on to the next lesson.
+ *
  * BACKEND IS THE AUTHORITY ON ORDER (spec 34): dragging only decides the
  * NEW ARRAY ORDER shown to the user; the actual persisted order always
  * comes back from the reorder API response, which we re-render with. A
@@ -507,11 +516,9 @@ const Curriculum = (() => {
       isDirty: () =>
         !saved &&
         JSON.stringify([titleInput.value, descInput.value, typeSelect.value, durationInput.value, previewCheckbox.checked]) !== initialSnapshot,
-      // Never silently abandon a running upload.
-      canClose: async () => {
-        if (!videoPanel || !videoPanel.isUploading()) return true;
-        return Ui.confirm({ title: 'Cancel the video upload?', message: 'A video is still uploading. Closing now cancels it.', confirmLabel: 'Cancel upload', danger: true });
-      },
+      // Phase 8.2: uploads run in the background now (UploadManager), so
+      // closing this editor no longer cancels them — nothing to confirm here.
+      canClose: async () => true,
       onClosed: async () => {
         if (videoPanel) videoPanel.destroy();
         // Video changes happen outside "Save changes": reflect them in the tree.

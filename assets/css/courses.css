@@ -293,6 +293,57 @@ select.input { appearance: auto; }
 }
 
 /* ==========================================================================
+   Floating upload tray (Phase 8.2) — background video uploads across lessons
+   ========================================================================== */
+
+.upload-tray {
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  width: 340px;
+  max-width: calc(100vw - var(--space-6) * 2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xl);
+  z-index: 60;
+  overflow: hidden;
+}
+.upload-tray-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--gradient-primary);
+  color: var(--color-text-on-accent);
+  cursor: pointer;
+  user-select: none;
+}
+.upload-tray-title { font-weight: 600; font-size: 0.875rem; }
+.upload-tray-toggle {
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: var(--space-1);
+  line-height: 1;
+}
+.upload-tray-list { list-style: none; margin: 0; padding: 0; max-height: 320px; overflow-y: auto; }
+.upload-tray-item { padding: var(--space-3) var(--space-4); border-top: 1px solid var(--color-border); }
+.upload-tray-item-head { display: flex; flex-direction: column; gap: 0.125rem; margin-bottom: var(--space-2); }
+.upload-tray-filename { font-size: 0.8125rem; font-weight: 600; color: var(--color-text); word-break: break-word; }
+.upload-tray-lesson { font-size: 0.75rem; color: var(--color-text-muted); }
+.upload-tray-item .progress { margin: var(--space-1) 0; }
+.upload-tray-item-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.upload-tray-pct { font-size: 0.75rem; color: var(--color-text-muted); }
+
+@media (max-width: 640px) {
+  .upload-tray { left: var(--space-3); right: var(--space-3); bottom: var(--space-3); width: auto; }
+}
+
+/* ==========================================================================
    Category & Instructor management (Phase 8.1)
    ========================================================================== */
 
