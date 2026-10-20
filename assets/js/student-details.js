@@ -79,12 +79,7 @@
     $('d-name').textContent = s.fullName;
     $('d-userid').textContent = s.userId;
     $('d-mobile').textContent = s.mobile || '—';
-    $('d-dob').textContent = s.dateOfBirth || '—';
-    $('d-gender').textContent = s.gender || '—';
-    $('d-address').textContent = s.address || '—';
-    $('d-city').textContent = s.city || '—';
     $('d-state').textContent = s.state || '—';
-    $('d-pincode').textContent = s.pincode || '—';
 
     Dom.clear($('d-status'));
     $('d-status').appendChild(Ui.statusBadge(s.status));
