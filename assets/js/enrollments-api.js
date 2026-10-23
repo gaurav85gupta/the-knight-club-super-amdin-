@@ -21,7 +21,7 @@ const EnrollmentApi = (() => {
 
   /** Builds ?a=b from ONLY the supported, non-empty parameters. */
   function toQuery(params) {
-    const allowed = ['search', 'status', 'course', 'student', 'dateFilter', 'dateFrom', 'dateTo', 'sort', 'page', 'limit'];
+    const allowed = ['search', 'status', 'course', 'student', 'source', 'dateFilter', 'dateFrom', 'dateTo', 'sort', 'page', 'limit'];
     const qs = new URLSearchParams();
     for (const key of allowed) {
       const v = params[key];

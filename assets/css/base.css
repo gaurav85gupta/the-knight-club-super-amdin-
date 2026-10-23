@@ -649,3 +649,18 @@ h1, h2, h3, h4, h5, h6 {
 .toast-msg { flex: 1; overflow-wrap: anywhere; }
 .toast-close { background: none; border: 0; color: inherit; font-size: 1.25rem; line-height: 1; cursor: pointer; padding: 0 var(--space-1); }
 .toast-close:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 2px; }
+/* ---- 1% Club badges (Order kind / Enrollment source / Member) ---------- */
+.badge-kind-membership,
+.badge-source-membership { background: #fff4d6; color: #7a5200; border: 1px solid #f0d58a; font-weight: 600; }
+.badge-kind-course,
+.badge-source-course { background: var(--color-surface-sunken, #f0ecfa); color: var(--color-text-muted, #4b5563); }
+.badge-source-cart { background: #e8f0fe; color: #1d4ed8; }
+.badge-paid { background: var(--color-success-bg, #dcfce7); color: var(--color-success-text, #166534); }
+.badge-refunded { background: #fee2e2; color: #991b1b; }
+
+/* Membership section tab strip */
+.section-tabs { display: flex; gap: var(--space-2, 0.5rem); margin-bottom: var(--space-4, 1rem); border-bottom: 1px solid var(--color-border, #e5e7eb); }
+.section-tabs a { padding: 0.55rem 1rem; text-decoration: none; color: var(--color-text-muted, #4b5563); font-weight: 600; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.section-tabs a.active { color: var(--color-text, #211a35); border-bottom-color: var(--color-text, #211a35); }
+.member-courses { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.member-course-chip { font-size: 0.75rem; padding: 0.1rem 0.5rem; border-radius: 999px; background: var(--color-surface-sunken, #f0ecfa); }

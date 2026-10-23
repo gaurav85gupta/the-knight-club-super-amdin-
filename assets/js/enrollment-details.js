@@ -96,10 +96,22 @@
     $('d-account-active').textContent = a.accountActive ? 'Yes' : 'No';
     $('d-course-public').textContent = a.courseCurrentlyPublic ? 'Yes' : 'No (does not affect this enrollment\u2019s access)';
 
+    // Source badge (Course / Cart / 1% Club)
+    const sourceCell = $('d-source');
+    Dom.clear(sourceCell);
+    sourceCell.appendChild(Ui.sourceBadge(e.source));
+
     // Originating order
     const orderLink = $('d-order-link');
     Dom.clear(orderLink);
-    orderLink.appendChild(Dom.el('a', { class: 'btn btn-outline btn-sm', href: `order-details.html?id=${encodeURIComponent(e.paymentId)}`, text: 'View order' }));
+    if (e.order) {
+      orderLink.appendChild(Dom.el('div', { class: 'cell-sub', text: `${e.order.orderNumber} · ${e.order.kind === 'MEMBERSHIP' ? '1% Club' + (e.order.membershipPlan ? ' — ' + e.order.membershipPlan.name : '') : 'Course cart'}` }));
+    }
+    if (e.paymentId) {
+      orderLink.appendChild(Dom.el('a', { class: 'btn btn-outline btn-sm', href: `order-details.html?id=${encodeURIComponent(e.paymentId)}`, text: 'View order' }));
+    } else if (!e.order) {
+      orderLink.appendChild(Dom.el('span', { class: 'cell-sub', text: 'No originating order recorded.' }));
+    }
   }
 
   if (!enrollmentId) {

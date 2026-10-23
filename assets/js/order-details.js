@@ -69,8 +69,30 @@
       $('d-student-id').textContent = o.student ? o.student.id : '—';
     }
 
+    // Order type + 1% Club membership summary
+    $('d-order-number').textContent = o.orderNumber || '—';
+    const kindCell = $('d-kind');
+    Dom.clear(kindCell);
+    kindCell.appendChild(Ui.kindBadge(o.kind));
+    const membershipSection = $('membership-section');
+    if (o.kind === 'MEMBERSHIP' && o.membership) {
+      $('d-membership-plan').textContent = o.membership.plan ? o.membership.plan.name : '—';
+      const chips = $('d-membership-courses');
+      Dom.clear(chips);
+      for (const c of o.membership.selectedCourses) chips.appendChild(Dom.el('span', { class: 'member-course-chip', text: c.title || 'Course' }));
+      const link = $('d-membership-link');
+      Dom.clear(link);
+      link.appendChild(Dom.el('a', { href: 'members.html', text: 'View in Membership' }));
+      membershipSection.hidden = false;
+    } else {
+      membershipSection.hidden = true;
+    }
+
     // Course
-    if (o.course && !o.course.deleted) {
+    if (o.course === null && Array.isArray(o.courses) && o.courses.length) {
+      $('d-course-title').textContent = o.courses.map((c) => c.title || '—').join(', ');
+      $('d-course-id').textContent = o.kind === 'MEMBERSHIP' ? 'Chosen via 1% Club' : 'Multi-course order';
+    } else if (o.course && !o.course.deleted) {
       $('d-course-title').textContent = o.course.title || '—';
       $('d-course-id').textContent = o.course.id;
     } else {
@@ -107,8 +129,11 @@
       failureBox.hidden = true;
     }
 
-    // Enrollment
-    if (o.enrollment) {
+    // Enrollment (legacy single-course) — or the order's own enrollments
+    if (!o.enrollment && Array.isArray(o.orderEnrollments) && o.orderEnrollments.length) {
+      $('d-enrollment-status').textContent = `${o.orderEnrollments.length} enrollment${o.orderEnrollments.length === 1 ? '' : 's'} (${o.orderEnrollments.map((e) => e.status).filter((v, i, a) => a.indexOf(v) === i).join(', ')})`;
+      $('d-enrolled-at').textContent = Dom.formatDateTime(o.orderEnrollments[0].enrolledAt);
+    } else if (o.enrollment) {
       $('d-enrollment-status').textContent = o.enrollment.status;
       $('d-enrolled-at').textContent = Dom.formatDateTime(o.enrollment.enrolledAt);
     } else {

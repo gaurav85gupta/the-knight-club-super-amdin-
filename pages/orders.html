@@ -32,10 +32,9 @@
         <a href="enrollments.html">Enrollments</a>
         <a href="orders.html" class="active" aria-current="page">Orders</a>
         <a href="leads.html">Leads</a>
-        <span class="nav-disabled" aria-disabled="true">Payments</span>
+        <a href="members.html">Membership</a>
         <a href="coupons.html">Coupons</a>
         <a href="analytics.html">Analytics</a>
-        <a href="membership.html">1% Club</a>
         <a href="placeholders.html">Placeholders</a>
         <a href="settings.html">Settings</a>
       </nav>
@@ -70,6 +69,11 @@
             <option value="CANCELLED">Cancelled</option>
             <option value="EXPIRED">Expired</option>
           </select>
+          <select class="input" id="f-kind" aria-label="Filter by order type">
+            <option value="">All types</option>
+            <option value="COURSE">Course orders</option>
+            <option value="MEMBERSHIP">1% Club orders</option>
+          </select>
           <select class="input" id="f-course" aria-label="Filter by course">
             <option value="">All courses</option>
           </select>
@@ -97,6 +101,7 @@
             <thead>
               <tr>
                 <th scope="col">Order</th>
+                <th scope="col">Type</th>
                 <th scope="col">Student</th>
                 <th scope="col">Course</th>
                 <th scope="col">Amount</th>

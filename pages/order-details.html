@@ -32,10 +32,9 @@
         <a href="enrollments.html">Enrollments</a>
         <a href="orders.html" class="active" aria-current="page">Orders</a>
         <a href="leads.html">Leads</a>
-        <span class="nav-disabled" aria-disabled="true">Payments</span>
+        <a href="members.html">Membership</a>
         <a href="coupons.html">Coupons</a>
         <a href="analytics.html">Analytics</a>
-        <a href="membership.html">1% Club</a>
         <a href="placeholders.html">Placeholders</a>
         <a href="settings.html">Settings</a>
       </nav>
@@ -65,6 +64,8 @@
         <div class="card">
           <div class="detail-grid">
             <div class="detail-item"><dt>Order ID</dt><dd class="order-id" id="d-id"></dd></div>
+            <div class="detail-item"><dt>Order number</dt><dd class="order-id" id="d-order-number"></dd></div>
+            <div class="detail-item"><dt>Order type</dt><dd id="d-kind"></dd></div>
             <div class="detail-item"><dt>Status</dt><dd id="d-status"></dd></div>
             <div class="detail-item"><dt>Created</dt><dd id="d-created"></dd></div>
             <div class="detail-item"><dt>Last updated</dt><dd id="d-updated"></dd></div>
@@ -76,6 +77,17 @@
           <div class="detail-grid">
             <div class="detail-item"><dt>Name</dt><dd id="d-student-name"></dd></div>
             <div class="detail-item"><dt>Student ID</dt><dd id="d-student-id"></dd></div>
+          </div>
+        </div>
+
+        <div id="membership-section" hidden>
+          <h3 class="order-section-title">1% Club membership</h3>
+          <div class="card">
+            <div class="detail-grid">
+              <div class="detail-item"><dt>Plan</dt><dd id="d-membership-plan"></dd></div>
+              <div class="detail-item"><dt>Courses chosen</dt><dd><div class="member-courses" id="d-membership-courses"></div></dd></div>
+              <div class="detail-item"><dt>Member record</dt><dd id="d-membership-link"></dd></div>
+            </div>
           </div>
         </div>
 

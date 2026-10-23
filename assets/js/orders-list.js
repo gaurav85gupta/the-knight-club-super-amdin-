@@ -37,7 +37,7 @@
   const els = {
     alert: $('page-alert'), body: $('orders-body'), table: $('orders-table'), state: $('state-box'),
     pager: $('pager'), info: $('pager-info'), page: $('pager-page'), prev: $('prev-btn'), next: $('next-btn'),
-    search: $('f-search'), status: $('f-status'), course: $('f-course'), date: $('f-date'),
+    search: $('f-search'), status: $('f-status'), kind: $('f-kind'), course: $('f-course'), date: $('f-date'),
     sort: $('f-sort'), reset: $('f-reset'), totalsGrid: $('totals-grid'),
   };
 
@@ -46,7 +46,7 @@
   let seq = 0;
 
   const criteria = () => ({
-    search: els.search.value, status: els.status.value, course: els.course.value,
+    search: els.search.value, status: els.status.value, kind: els.kind.value, course: els.course.value,
     dateFilter: els.date.value, sort: els.sort.value, page: state.page, limit: LIMIT,
   });
 
@@ -131,8 +131,18 @@
   }
 
   function formatCourse(o) {
-    if (!o.course) return Dom.el('span', { class: 'cell-sub', text: 'Deleted course' });
-    return Dom.el('span', { text: o.course.title });
+    if (o.kind === 'MEMBERSHIP') {
+      return Dom.el('span', { text: o.membershipPlan ? `${o.membershipPlan.name} (courses of choice)` : '1% Club membership' });
+    }
+    if (o.course) return Dom.el('span', { text: o.course.title });
+    if (Array.isArray(o.courses) && o.courses.length) return Dom.el('span', { text: o.courses.map((c) => c.title).join(', ') });
+    return Dom.el('span', { class: 'cell-sub', text: 'Deleted course' });
+  }
+
+  function formatOrderId(o) {
+    const box = Dom.el('div', {}, [Dom.el('span', { class: 'order-id', text: o.id })]);
+    if (o.orderNumber) box.appendChild(Dom.el('div', { class: 'cell-sub', text: o.orderNumber }));
+    return box;
   }
 
   // ---- Row rendering (textContent only) -----------------------------------
@@ -140,7 +150,8 @@
     Dom.clear(els.body);
     for (const o of items) {
       els.body.appendChild(Dom.el('tr', {}, [
-        Dom.el('td', {}, [Dom.el('span', { class: 'order-id', text: o.id })]),
+        Dom.el('td', {}, [formatOrderId(o)]),
+        Dom.el('td', {}, [Ui.kindBadge(o.kind)]),
         Dom.el('td', {}, [formatStudent(o)]),
         Dom.el('td', {}, [formatCourse(o)]),
         Dom.el('td', {}, [formatAmount(o)]),
@@ -206,9 +217,9 @@
   const reloadSearch = Dom.debounce(reload, 350);
 
   els.search.addEventListener('input', reloadSearch);
-  for (const sel of [els.status, els.course, els.date, els.sort]) sel.addEventListener('change', reload);
+  for (const sel of [els.status, els.kind, els.course, els.date, els.sort]) sel.addEventListener('change', reload);
   els.reset.addEventListener('click', () => {
-    els.search.value = ''; els.status.value = ''; els.course.value = '';
+    els.search.value = ''; els.status.value = ''; els.kind.value = ''; els.course.value = '';
     els.date.value = ''; els.sort.value = 'newest';
     reload();
   });

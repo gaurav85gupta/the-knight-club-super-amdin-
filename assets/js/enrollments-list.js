@@ -40,7 +40,7 @@
   const els = {
     alert: $('page-alert'), body: $('enrollments-body'), table: $('enrollments-table'), state: $('state-box'),
     pager: $('pager'), info: $('pager-info'), page: $('pager-page'), prev: $('prev-btn'), next: $('next-btn'),
-    search: $('f-search'), status: $('f-status'), course: $('f-course'), student: $('f-student'), date: $('f-date'),
+    search: $('f-search'), status: $('f-status'), source: $('f-source'), course: $('f-course'), student: $('f-student'), date: $('f-date'),
     sort: $('f-sort'), reset: $('f-reset'),
   };
 
@@ -49,7 +49,7 @@
   let seq = 0;
 
   const criteria = () => ({
-    search: els.search.value, status: els.status.value, course: els.course.value, student: els.student.value,
+    search: els.search.value, status: els.status.value, source: els.source.value, course: els.course.value, student: els.student.value,
     dateFilter: els.date.value, sort: els.sort.value, page: state.page, limit: LIMIT,
   });
 
@@ -115,6 +115,12 @@
   }
 
   // ---- Row rendering (textContent only) -----------------------------------
+  function sourceCell(e) {
+    const box = Dom.el('div', {}, [Ui.sourceBadge(e.source)]);
+    if (e.orderNumber) box.appendChild(Dom.el('div', { class: 'cell-sub', text: e.orderNumber }));
+    return box;
+  }
+
   function renderRows(items) {
     Dom.clear(els.body);
     for (const e of items) {
@@ -122,6 +128,7 @@
         Dom.el('td', {}, [Dom.el('span', { class: 'order-id', text: e.id })]),
         Dom.el('td', {}, [formatStudent(e)]),
         Dom.el('td', {}, [formatCourse(e)]),
+        Dom.el('td', {}, [sourceCell(e)]),
         Dom.el('td', {}, [Ui.statusBadge(e.status)]),
         Dom.el('td', {}, [formatAccess(e)]),
         Dom.el('td', { text: Dom.formatDate(e.enrolledAt) }),
@@ -182,9 +189,9 @@
   const reloadSearch = Dom.debounce(reload, 350);
 
   els.search.addEventListener('input', reloadSearch);
-  for (const sel of [els.status, els.course, els.student, els.date, els.sort]) sel.addEventListener('change', reload);
+  for (const sel of [els.status, els.source, els.course, els.student, els.date, els.sort]) sel.addEventListener('change', reload);
   els.reset.addEventListener('click', () => {
-    els.search.value = ''; els.status.value = ''; els.course.value = ''; els.student.value = '';
+    els.search.value = ''; els.status.value = ''; els.source.value = ''; els.course.value = ''; els.student.value = '';
     els.date.value = ''; els.sort.value = 'newest';
     reload();
   });

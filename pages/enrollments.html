@@ -33,10 +33,9 @@
         <a href="enrollments.html" class="active" aria-current="page">Enrollments</a>
         <a href="orders.html">Orders</a>
         <a href="leads.html">Leads</a>
-        <span class="nav-disabled" aria-disabled="true">Payments</span>
+        <a href="members.html">Membership</a>
         <a href="coupons.html">Coupons</a>
         <a href="analytics.html">Analytics</a>
-        <a href="membership.html">1% Club</a>
         <a href="placeholders.html">Placeholders</a>
         <a href="settings.html">Settings</a>
       </nav>
@@ -63,6 +62,12 @@
           <select class="input" id="f-status" aria-label="Filter by enrollment status">
             <option value="">All statuses</option>
             <option value="ACTIVE">Active</option>
+          </select>
+          <select class="input" id="f-source" aria-label="Filter by source">
+            <option value="">All sources</option>
+            <option value="COURSE">Single course</option>
+            <option value="CART">Cart</option>
+            <option value="MEMBERSHIP">1% Club</option>
           </select>
           <select class="input" id="f-course" aria-label="Filter by course">
             <option value="">All courses</option>
@@ -94,6 +99,7 @@
                 <th scope="col">Enrollment</th>
                 <th scope="col">Student</th>
                 <th scope="col">Course</th>
+                <th scope="col">Source</th>
                 <th scope="col">Status</th>
                 <th scope="col">Access</th>
                 <th scope="col">Enrolled</th>

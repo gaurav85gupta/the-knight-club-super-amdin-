@@ -67,6 +67,7 @@
   function formatStudent(s) {
     return Dom.el('div', {}, [
       Dom.el('div', { class: 'cell-title', text: s.fullName }),
+      s.isMember ? Ui.memberBadge() : null,
     ]);
   }
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>1% Club — The Knight Club Super Admin</title>
+  <title>Plan settings — Membership — The Knight Club Super Admin</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -33,10 +33,9 @@
         <a href="enrollments.html">Enrollments</a>
         <a href="orders.html">Orders</a>
         <a href="leads.html">Leads</a>
-        <span class="nav-disabled" aria-disabled="true">Payments</span>
+        <a href="members.html" class="active" aria-current="page">Membership</a>
         <a href="coupons.html">Coupons</a>
         <a href="analytics.html">Analytics</a>
-        <a href="membership.html" class="active" aria-current="page">1% Club</a>
         <a href="placeholders.html">Placeholders</a>
         <a href="settings.html">Settings</a>
       </nav>
@@ -45,13 +44,18 @@
     <main class="main-content" id="main-content" tabindex="-1">
       <div class="topbar">
         <div class="topbar-left">
-          <h1 style="margin:0;">1% Club Management</h1>
+          <h1 style="margin:0;">Membership</h1>
         </div>
         <div class="topbar-right">
           <span id="admin-identity" class="admin-identity"></span>
           <button type="button" id="logout-btn" class="btn btn-outline btn-sm">Sign out</button>
         </div>
       </div>
+
+      <nav class="section-tabs" aria-label="Membership sections">
+        <a href="members.html">Members</a>
+        <a href="membership.html" class="active" aria-current="page">Plan settings</a>
+      </nav>
 
       <div id="page-alert" class="alert" role="alert" tabindex="-1" hidden></div>
 

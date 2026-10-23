@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Membership — The Knight Club Super Admin</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/auth.css" />
+  <link rel="stylesheet" href="../assets/css/courses.css" />
+  <link rel="stylesheet" href="../assets/css/coupons.css" />
+  <link rel="stylesheet" href="../assets/css/orders.css" />
+  <style>html.auth-pending body { visibility: hidden; }</style>
+  <script>document.documentElement.classList.add('auth-pending');</script>
+  <noscript><style>html.auth-pending body { visibility: visible; }</style></noscript>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">The <span>Knight Club</span></div>
+      <nav aria-label="Admin modules">
+        <a href="../index.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+        <a href="categories.html">Categories</a>
+        <a href="instructors.html">Instructors</a>
+        <a href="students.html">Students</a>
+        <a href="enrollments.html">Enrollments</a>
+        <a href="orders.html">Orders</a>
+        <a href="leads.html">Leads</a>
+        <a href="members.html" class="active" aria-current="page">Membership</a>
+        <a href="coupons.html">Coupons</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="placeholders.html">Placeholders</a>
+        <a href="settings.html">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main-content" id="main-content" tabindex="-1">
+      <div class="topbar">
+        <span></span>
+        <div class="topbar-right">
+          <span id="admin-identity" class="admin-identity"></span>
+          <button type="button" id="logout-btn" class="btn btn-outline btn-sm">Sign out</button>
+        </div>
+      </div>
+
+      <div class="page-head">
+        <h1 id="page-title">Member</h1>
+        <div class="table-actions">
+          <a href="members.html" class="btn btn-outline btn-sm">Back to members</a>
+        </div>
+      </div>
+
+      <div id="page-alert" class="alert" role="alert" tabindex="-1" hidden></div>
+      <div id="load-state" class="state-box" hidden></div>
+
+      <div id="content" hidden>
+        <h3 class="order-section-title">Student</h3>
+        <div class="card">
+          <div class="detail-grid">
+            <div class="detail-item"><dt>Name</dt><dd id="d-student-name"></dd></div>
+            <div class="detail-item"><dt>Student ID</dt><dd id="d-student-userid"></dd></div>
+            <div class="detail-item"><dt>Mobile</dt><dd id="d-student-mobile"></dd></div>
+            <div class="detail-item"><dt>Profile</dt><dd id="d-student-link"></dd></div>
+          </div>
+        </div>
+
+        <h3 class="order-section-title">Purchase</h3>
+        <div class="card">
+          <div class="detail-grid">
+            <div class="detail-item"><dt>Order number</dt><dd class="order-id" id="d-order-number"></dd></div>
+            <div class="detail-item"><dt>Status</dt><dd id="d-status"></dd></div>
+            <div class="detail-item"><dt>Plan</dt><dd id="d-plan"></dd></div>
+            <div class="detail-item"><dt>Amount paid</dt><dd id="d-amount"></dd></div>
+            <div class="detail-item"><dt>Coupon</dt><dd id="d-coupon"></dd></div>
+            <div class="detail-item"><dt>Purchased on</dt><dd id="d-paid-at"></dd></div>
+            <div class="detail-item"><dt>Razorpay payment ID</dt><dd class="order-id" id="d-rzp"></dd></div>
+            <div class="detail-item"><dt>Payment record</dt><dd id="d-payment-link"></dd></div>
+          </div>
+        </div>
+
+        <h3 class="order-section-title">Courses chosen</h3>
+        <div class="card"><div class="member-courses" id="d-selected"></div></div>
+
+        <h3 class="order-section-title">Access granted (enrollments)</h3>
+        <div class="card">
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th scope="col">Course</th><th scope="col">Source</th><th scope="col">Status</th><th scope="col">Enrolled</th><th scope="col"></th></tr></thead>
+              <tbody id="d-enrollments"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/forms.js"></script>
+  <script src="../assets/js/dom.js"></script>
+  <script src="../assets/js/ui.js"></script>
+  <script src="../assets/js/members-api.js"></script>
+  <script src="../assets/js/member-details.js"></script>
+</body>
+</html>

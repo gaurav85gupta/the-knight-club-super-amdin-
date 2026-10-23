@@ -86,6 +86,8 @@
     $('d-created').textContent = Dom.formatDateTime(s.createdAt);
     $('d-last-login').textContent = s.lastLoginAt ? Dom.formatDateTime(s.lastLoginAt) : 'Never';
 
+    renderMembership(s.membership);
+
     // Account actions: exactly one of the two is ever shown, matching the
     // student's REAL current status — never both, never neither.
     if (s.status === 'ACTIVE') {
@@ -101,6 +103,34 @@
   }
 
   // ---- Enrollments -----------------------------------------------------------
+  // ---- 1% Club membership card -------------------------------------------
+  function renderMembership(m) {
+    const statusCell = $('d-member-status');
+    Dom.clear(statusCell);
+    const wrap = $('member-purchases-wrap');
+    const body = $('member-purchases-body');
+    Dom.clear(body);
+    if (m && m.isMember) {
+      statusCell.appendChild(Ui.memberBadge());
+      $('d-member-since').textContent = Dom.formatDate(m.since);
+      wrap.hidden = false;
+      for (const p of m.purchases) {
+        body.appendChild(Dom.el('tr', {}, [
+          Dom.el('td', {}, [Dom.el('span', { class: 'order-id', text: p.orderNumber })]),
+          Dom.el('td', { text: p.plan ? p.plan.name : '—' }),
+          Dom.el('td', {}, [Dom.el('div', { class: 'member-courses' }, (p.courses || []).map((t) => Dom.el('span', { class: 'member-course-chip', text: t })))]),
+          Dom.el('td', { text: money(p.amount, p.currency) }),
+          Dom.el('td', { text: Dom.formatDate(p.paidAt) }),
+          Dom.el('td', {}, [Dom.el('a', { class: 'btn btn-outline btn-sm', href: `member-details.html?id=${encodeURIComponent(p.orderId)}`, text: 'Details' })]),
+        ]));
+      }
+    } else {
+      statusCell.textContent = 'Not a member';
+      $('d-member-since').textContent = '—';
+      wrap.hidden = true;
+    }
+  }
+
   function renderEnrollments(items) {
     const body = $('enrollments-body');
     Dom.clear(body);
@@ -112,6 +142,7 @@
     for (const e of items) {
       body.appendChild(Dom.el('tr', {}, [
         Dom.el('td', {}, [e.course ? Dom.el('span', { text: e.course.title }) : Dom.el('span', { class: 'cell-sub', text: 'Deleted course' })]),
+        Dom.el('td', {}, [Ui.sourceBadge(e.source)]),
         Dom.el('td', {}, [Ui.statusBadge(e.status)]),
         Dom.el('td', { text: Dom.formatDate(e.enrolledAt) }),
         Dom.el('td', { text: e.completedAt ? Dom.formatDate(e.completedAt) : '—' }),
@@ -130,6 +161,13 @@
     return box;
   }
 
+  function orderCourseLabel(o) {
+    if (o.kind === 'MEMBERSHIP') return Dom.el('span', { text: o.membershipPlan ? o.membershipPlan.name : '1% Club membership' });
+    if (o.course) return Dom.el('span', { text: o.course.title });
+    if (Array.isArray(o.courses) && o.courses.length) return Dom.el('span', { text: o.courses.map((c) => c.title).join(', ') });
+    return Dom.el('span', { class: 'cell-sub', text: 'Deleted course' });
+  }
+
   function renderOrders(items) {
     const body = $('orders-body');
     Dom.clear(body);
@@ -141,7 +179,8 @@
     for (const o of items) {
       body.appendChild(Dom.el('tr', {}, [
         Dom.el('td', {}, [Dom.el('span', { class: 'order-id', text: o.id })]),
-        Dom.el('td', {}, [o.course ? Dom.el('span', { text: o.course.title }) : Dom.el('span', { class: 'cell-sub', text: 'Deleted course' })]),
+        Dom.el('td', {}, [Ui.kindBadge(o.kind)]),
+        Dom.el('td', {}, [orderCourseLabel(o)]),
         Dom.el('td', {}, [formatAmount(o)]),
         Dom.el('td', { text: o.couponCode || '—' }),
         Dom.el('td', {}, [Ui.paymentStatusBadge(o.status)]),

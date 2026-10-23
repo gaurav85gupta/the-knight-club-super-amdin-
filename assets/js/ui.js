@@ -229,9 +229,31 @@ const Ui = (() => {
     }
   }
 
+  /**
+   * 1% Club badges. Labels come ONLY from the backend values
+   * (Order.kind / Enrollment.source) — never invented UI-side states.
+   */
+  const KIND_LABELS = Object.freeze({ COURSE: 'Course', MEMBERSHIP: '1% Club' });
+  const SOURCE_LABELS = Object.freeze({ COURSE: 'Course', CART: 'Cart', MEMBERSHIP: '1% Club' });
+
+  function kindBadge(kind) {
+    const k = String(kind || 'COURSE');
+    return Dom.el('span', { class: `badge badge-sm badge-kind-${k.toLowerCase()}`, text: KIND_LABELS[k] || k });
+  }
+
+  function sourceBadge(source) {
+    const k = String(source || 'COURSE');
+    return Dom.el('span', { class: `badge badge-sm badge-source-${k.toLowerCase()}`, text: SOURCE_LABELS[k] || k });
+  }
+
+  function memberBadge() {
+    return Dom.el('span', { class: 'badge badge-sm badge-kind-membership', text: '1% Club Member' });
+  }
+
   return {
     confirm, notify, statusBadge, visibilityBadge, couponStateBadge, paymentStatusBadge,
     leadStatusBadge, ENQUIRY_TYPE_LABELS, messageForError, copyToClipboard,
+    kindBadge, sourceBadge, memberBadge,
   };
 })();
 

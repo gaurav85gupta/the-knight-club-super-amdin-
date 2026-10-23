@@ -33,10 +33,9 @@
         <a href="enrollments.html">Enrollments</a>
         <a href="orders.html">Orders</a>
         <a href="leads.html">Leads</a>
-        <span class="nav-disabled" aria-disabled="true">Payments</span>
+        <a href="members.html">Membership</a>
         <a href="coupons.html">Coupons</a>
         <a href="analytics.html">Analytics</a>
-        <a href="membership.html">1% Club</a>
         <a href="placeholders.html">Placeholders</a>
         <a href="settings.html">Settings</a>
       </nav>
@@ -87,6 +86,20 @@
         </div>
 
         <!-- ENROLLMENTS -->
+        <h3 class="order-section-title">1% Club membership</h3>
+        <div class="card" id="membership-card">
+          <div class="detail-grid">
+            <div class="detail-item"><dt>Membership</dt><dd id="d-member-status"></dd></div>
+            <div class="detail-item"><dt>Member since</dt><dd id="d-member-since"></dd></div>
+          </div>
+          <div class="table-wrap" id="member-purchases-wrap" hidden style="margin-top: var(--space-4);">
+            <table class="table">
+              <thead><tr><th scope="col">Order</th><th scope="col">Plan</th><th scope="col">Courses chosen</th><th scope="col">Amount</th><th scope="col">Purchased</th><th scope="col"></th></tr></thead>
+              <tbody id="member-purchases-body"></tbody>
+            </table>
+          </div>
+        </div>
+
         <h3 class="order-section-title">Enrollments</h3>
         <div class="card">
           <div class="table-wrap">
@@ -94,6 +107,7 @@
               <thead>
                 <tr>
                   <th scope="col">Course</th>
+                  <th scope="col">Source</th>
                   <th scope="col">Status</th>
                   <th scope="col">Enrolled</th>
                   <th scope="col">Completed</th>
@@ -113,6 +127,7 @@
               <thead>
                 <tr>
                   <th scope="col">Order</th>
+                  <th scope="col">Type</th>
                   <th scope="col">Course</th>
                   <th scope="col">Amount</th>
                   <th scope="col">Coupon</th>
