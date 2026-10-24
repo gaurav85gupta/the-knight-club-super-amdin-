@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testimonial — The Knight Club Super Admin</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/auth.css" />
+  <link rel="stylesheet" href="../assets/css/courses.css" />
+  <link rel="stylesheet" href="../assets/css/coupons.css" />
+  <link rel="stylesheet" href="../assets/css/testimonials.css" />
+  <style>html.auth-pending body { visibility: hidden; }</style>
+  <script>document.documentElement.classList.add('auth-pending');</script>
+  <noscript><style>html.auth-pending body { visibility: visible; }</style></noscript>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">The <span>Knight Club</span></div>
+      <nav aria-label="Admin modules">
+        <a href="../index.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+        <a href="categories.html">Categories</a>
+        <a href="instructors.html">Instructors</a>
+        <a href="testimonials.html" class="active" aria-current="page">Testimonials</a>
+        <a href="students.html">Students</a>
+        <a href="enrollments.html">Enrollments</a>
+        <a href="orders.html">Orders</a>
+        <a href="leads.html">Leads</a>
+        <a href="members.html">Membership</a>
+        <a href="coupons.html">Coupons</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="placeholders.html">Placeholders</a>
+        <a href="settings.html">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main-content" id="main-content" tabindex="-1">
+      <div class="topbar">
+        <span></span>
+        <div class="topbar-right">
+          <span id="admin-identity" class="admin-identity"></span>
+          <button type="button" id="logout-btn" class="btn btn-outline btn-sm">Sign out</button>
+        </div>
+      </div>
+
+      <div class="page-head">
+        <h1 id="page-title">New testimonial</h1>
+        <a href="testimonials.html" id="back-link" class="btn btn-outline btn-sm">Back to testimonials</a>
+      </div>
+
+      <div id="page-alert" class="alert" role="alert" tabindex="-1" hidden></div>
+      <div id="load-state" class="state-box" hidden></div>
+
+      <form id="testimonial-form" novalidate autocomplete="off" hidden>
+
+        <section class="card form-section" id="publishing-section" aria-labelledby="sec-publish" hidden>
+          <h3 id="sec-publish">Status</h3>
+          <div class="publish-panel">
+            <div class="state">
+              <span>Status: <span id="pub-status"></span></span>
+              <span class="cell-sub" id="pub-date"></span>
+            </div>
+            <div class="table-actions" id="pub-actions"></div>
+          </div>
+        </section>
+
+        <section class="card form-section" aria-labelledby="sec-basic">
+          <h3 id="sec-basic">Basic information</h3>
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="field">
+                <label for="name">Name</label>
+                <input class="input" id="name" name="name" type="text" maxlength="80" required aria-describedby="name-error" />
+                <p class="field-error" id="name-error" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="role">Role</label>
+                <input class="input" id="role" name="role" type="text" maxlength="120" aria-describedby="role-error" />
+                <p class="field-error" id="role-error" aria-live="polite"></p>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="program">Program</label>
+                <select class="input" id="program" name="program" aria-describedby="program-hint">
+                  <option value="">— None —</option>
+                  <option value="1% Club member">1% Club member</option>
+                  <option value="__custom__">Custom value…</option>
+                </select>
+                <input class="input" id="program-custom" type="text" maxlength="150" placeholder="Enter program value" hidden style="margin-top: var(--space-2);" />
+                <p class="hint" id="program-hint">Use “1% Club member” for the 1% Club page's standardized filter.</p>
+              </div>
+              <div class="field">
+                <label for="topic">Topic</label>
+                <input class="input" id="topic" name="topic" type="text" maxlength="100" aria-describedby="topic-error" />
+                <p class="field-error" id="topic-error" aria-live="polite"></p>
+              </div>
+            </div>
+            <div class="form-row three">
+              <div class="field">
+                <label for="course">Course (optional)</label>
+                <select class="input" id="course" name="course"><option value="">— None —</option></select>
+                <p class="field-error" id="course-error" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="featured">Featured</label>
+                <select class="input" id="featured" name="featured">
+                  <option value="false">Not featured</option>
+                  <option value="true">Featured</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="order">Display order</label>
+                <input class="input" id="order" name="order" type="text" inputmode="numeric" placeholder="0" aria-describedby="order-error" />
+                <p class="field-error" id="order-error" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card form-section" aria-labelledby="sec-type">
+          <h3 id="sec-type">Testimonial type</h3>
+          <p class="section-hint">Changing the type changes which fields below are required.</p>
+          <div class="type-selector" role="group" aria-label="Testimonial type">
+            <button type="button" class="btn btn-outline" id="type-photo-btn" data-type="PHOTO" aria-pressed="false">Photo</button>
+            <button type="button" class="btn btn-outline" id="type-video-btn" data-type="VIDEO" aria-pressed="false">Video</button>
+            <button type="button" class="btn btn-outline" id="type-written-btn" data-type="WRITTEN" aria-pressed="false">Written</button>
+          </div>
+
+          <div class="type-panel" id="panel-photo" hidden>
+            <div class="field">
+              <label for="photo-ref">Photo reference</label>
+              <input class="input" id="photo-ref" type="text" maxlength="500" spellcheck="false" aria-describedby="photo-hint photo-error" />
+              <p class="hint" id="photo-hint">An https image URL or a storage key — or upload an image below.</p>
+              <p class="field-error" id="photo-error" aria-live="polite"></p>
+
+              <div class="thumbnail-upload-slot" id="photo-upload-slot">
+                <div class="thumbnail-upload-preview is-empty" id="photo-upload-preview"></div>
+                <div class="thumbnail-upload-actions">
+                  <label class="btn btn-outline btn-sm thumbnail-upload-label" for="photo-upload-input" aria-describedby="photo-upload-status">
+                    Upload Photo
+                  </label>
+                  <input type="file" id="photo-upload-input" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" class="sr-only" aria-label="Upload testimonial photo" />
+                </div>
+                <p class="thumbnail-upload-status" id="photo-upload-status" aria-live="polite" role="status"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="type-panel" id="panel-video" hidden>
+            <div class="field">
+              <label for="bunny-video-id">Bunny video ID</label>
+              <input class="input" id="bunny-video-id" type="text" maxlength="100" spellcheck="false" aria-describedby="video-hint video-error" />
+              <p class="hint" id="video-hint">Upload a video below, or paste an existing Bunny Stream video identifier directly. This is not a public playback URL. The video must finish processing at Bunny before this testimonial can be published.</p>
+              <p class="field-error" id="video-error" aria-live="polite"></p>
+
+              <div id="video-upload-mount"></div>
+            </div>
+          </div>
+
+          <div class="type-panel" id="panel-written" hidden>
+            <div class="field">
+              <label for="quote">Quote</label>
+              <textarea class="input" id="quote" maxlength="600" rows="3" aria-describedby="quote-count quote-error"></textarea>
+              <div class="char-count" id="quote-count"></div>
+              <p class="field-error" id="quote-error" aria-live="polite"></p>
+            </div>
+            <div class="field">
+              <label for="story">Story</label>
+              <textarea class="input" id="story" maxlength="4000" rows="8" aria-describedby="story-count story-error"></textarea>
+              <div class="char-count" id="story-count"></div>
+              <p class="field-error" id="story-error" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <!-- Quote/story also act as a short caption for PHOTO/VIDEO testimonials, since the model requires a non-empty `quote`. -->
+          <div class="type-panel" id="panel-caption" hidden>
+            <div class="field">
+              <label for="quote-caption">Caption / quote</label>
+              <textarea class="input" id="quote-caption" maxlength="600" rows="2" aria-describedby="quote-caption-count quote-caption-error"></textarea>
+              <div class="char-count" id="quote-caption-count"></div>
+              <p class="field-error" id="quote-caption-error" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <div class="action-bar">
+          <button class="btn btn-primary" id="save-btn" type="submit"><span class="spinner" aria-hidden="true"></span><span class="label">Save draft</span></button>
+          <a href="testimonials.html" class="btn btn-outline" id="cancel-link">Cancel</a>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/forms.js"></script>
+  <script src="../assets/js/dom.js"></script>
+  <script src="../assets/js/ui.js"></script>
+  <script src="../assets/js/courses-api.js"></script>
+  <script src="../assets/js/testimonials-api.js"></script>
+  <!-- NEW (additive): testimonial VIDEO upload — same TUS client/poller already used by curriculum/placeholders/membership video, reused unchanged. -->
+  <script src="../assets/js/vendor/tus.min.js"></script>
+  <script src="../assets/js/video-upload.js"></script>
+  <script src="../assets/js/video-poller.js"></script>
+  <script src="../assets/js/testimonial-video-api.js"></script>
+  <script src="../assets/js/testimonial-video-panel.js"></script>
+  <script src="../assets/js/testimonial-form.js"></script>
+</body>
+</html>

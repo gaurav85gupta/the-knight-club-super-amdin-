@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testimonials — The Knight Club Super Admin</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/auth.css" />
+  <link rel="stylesheet" href="../assets/css/courses.css" />
+  <link rel="stylesheet" href="../assets/css/coupons.css" />
+  <link rel="stylesheet" href="../assets/css/testimonials.css" />
+  <style>html.auth-pending body { visibility: hidden; }</style>
+  <script>document.documentElement.classList.add('auth-pending');</script>
+  <noscript><style>html.auth-pending body { visibility: visible; }</style></noscript>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">The <span>Knight Club</span></div>
+      <nav aria-label="Admin modules">
+        <a href="../index.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+        <a href="categories.html">Categories</a>
+        <a href="instructors.html">Instructors</a>
+        <a href="testimonials.html" class="active" aria-current="page">Testimonials</a>
+        <a href="students.html">Students</a>
+        <a href="enrollments.html">Enrollments</a>
+        <a href="orders.html">Orders</a>
+        <a href="leads.html">Leads</a>
+        <a href="members.html">Membership</a>
+        <a href="coupons.html">Coupons</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="placeholders.html">Placeholders</a>
+        <a href="settings.html">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main-content" id="main-content" tabindex="-1">
+      <div class="topbar">
+        <span></span>
+        <div class="topbar-right">
+          <span id="admin-identity" class="admin-identity"></span>
+          <button type="button" id="logout-btn" class="btn btn-outline btn-sm">Sign out</button>
+        </div>
+      </div>
+
+      <div class="page-head">
+        <h1>Testimonials</h1>
+        <a href="testimonial-form.html" class="btn btn-primary btn-sm">Add Testimonial</a>
+      </div>
+
+      <div id="page-alert" class="alert" role="alert" tabindex="-1" hidden></div>
+
+      <p class="text-muted" style="margin-top: calc(-1 * var(--space-4));">Testimonials shown on the Main Testimonials page and the 1% Club page share this one list. Only Published testimonials appear publicly.</p>
+
+      <div class="stat-grid" id="stat-grid" hidden></div>
+
+      <div class="card">
+        <div class="filters filters-testimonials" role="search">
+          <input class="input" id="f-search" type="search" placeholder="Search name, role, or quote…" maxlength="100" aria-label="Search testimonials" />
+          <select class="input" id="f-status" aria-label="Filter by status">
+            <option value="">All statuses</option>
+            <option value="DRAFT">Draft</option>
+            <option value="PUBLISHED">Published</option>
+            <option value="ARCHIVED">Archived</option>
+          </select>
+          <select class="input" id="f-type" aria-label="Filter by type">
+            <option value="">All types</option>
+            <option value="PHOTO">Photo</option>
+            <option value="VIDEO">Video</option>
+            <option value="WRITTEN">Written</option>
+          </select>
+          <select class="input" id="f-featured" aria-label="Filter by featured">
+            <option value="">All testimonials</option>
+            <option value="true">Featured only</option>
+            <option value="false">Not featured</option>
+          </select>
+          <select class="input" id="f-sort" aria-label="Sort testimonials">
+            <option value="order">Display order</option>
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="updated">Recently updated</option>
+            <option value="published">Recently published</option>
+          </select>
+          <button type="button" id="f-reset" class="btn btn-outline btn-sm">Reset filters</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table" id="rows-table" aria-busy="false">
+            <thead>
+              <tr>
+                <th scope="col">Testimonial</th>
+                <th scope="col">Type</th>
+                <th scope="col">Program</th>
+                <th scope="col">Featured</th>
+                <th scope="col">Status</th>
+                <th scope="col">Published</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rows-body"></tbody>
+          </table>
+        </div>
+        <div id="state-box" class="state-box" hidden></div>
+
+        <div class="pager" id="pager" hidden>
+          <span id="pager-info"></span>
+          <div class="pager-buttons">
+            <button type="button" id="prev-btn" class="btn btn-outline btn-sm">Previous</button>
+            <span id="pager-page"></span>
+            <button type="button" id="next-btn" class="btn btn-outline btn-sm">Next</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/forms.js"></script>
+  <script src="../assets/js/dom.js"></script>
+  <script src="../assets/js/ui.js"></script>
+  <script src="../assets/js/testimonials-api.js"></script>
+  <script src="../assets/js/testimonials-list.js"></script>
+</body>
+</html>

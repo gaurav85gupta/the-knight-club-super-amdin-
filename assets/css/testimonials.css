@@ -1,0 +1,80 @@
+/* ==========================================================================
+   THE KNIGHT CLUB — Super Admin: Testimonials management (Phase 7)
+   Tokens only (tokens.css); reuses .card/.table/.state-box/.pager/.badge/
+   .field/.form-grid/.form-row/.modal/.stat-grid/.stat-card/.filters from
+   base.css, courses.css and coupons.css. Only testimonial-specific pieces
+   are defined here.
+   ========================================================================== */
+
+/* ---- List filters: search + status + type + program + featured + reset ---- */
+.filters.filters-testimonials { grid-template-columns: 2fr repeat(4, 1fr) auto; align-items: center; }
+@media (max-width: 1024px) { .filters.filters-testimonials { grid-template-columns: 1fr 1fr; } }
+
+/* ---- Type badges (PHOTO / VIDEO / WRITTEN) ---- */
+.badge-type-photo   { background: var(--color-surface-sunken); color: var(--color-text-muted); }
+.badge-type-video   { background: #e8f0fe; color: #1d4ed8; }
+.badge-type-written { background: #fff4d6; color: #7a5200; }
+
+/* ---- Featured badge ---- */
+.badge-featured { background: var(--gradient-primary, #f0ecfa); color: var(--color-white); }
+.badge-not-featured { background: var(--color-surface-sunken); color: var(--color-text-muted); }
+
+/* ---- Row media preview (small thumbnail / video / written indicator) ---- */
+.testimonial-media-cell { display: flex; align-items: center; gap: var(--space-2); }
+.testimonial-thumb {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.testimonial-thumb-placeholder {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-sunken);
+  border: 1px dashed var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+.testimonial-quote-preview {
+  max-width: 22rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* ---- Type selector (create/edit form) ---- */
+.type-selector { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-4); }
+.type-selector button {
+  flex: 1;
+  min-width: 8rem;
+}
+.type-selector button[aria-pressed="true"] {
+  background: var(--color-primary, #6d28d9);
+  color: var(--color-white);
+  border-color: var(--color-primary, #6d28d9);
+}
+
+/* ---- Type-specific form panels ---- */
+.type-panel[hidden] { display: none; }
+
+/* ---- Story textarea: preserve paragraph breaks visually while typing ---- */
+textarea#story { white-space: pre-wrap; }
+
+/* ---- Detail view (read-only) ---- */
+.detail-view dt { font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: var(--space-1); }
+.detail-view dd { margin: 0 0 var(--space-4) 0; }
+.detail-story { white-space: pre-wrap; }
+
+@media (max-width: 480px) {
+  .testimonial-quote-preview { max-width: 10rem; }
+}
