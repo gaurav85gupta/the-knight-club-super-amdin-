@@ -7,9 +7,9 @@
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/tokens.css" />
-  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/base.css?v=p3" />
   <link rel="stylesheet" href="../assets/css/auth.css" />
   <link rel="stylesheet" href="../assets/css/courses.css" />
   <link rel="stylesheet" href="../assets/css/membership.css" />
@@ -22,7 +22,8 @@
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
   <div class="app-shell">
-    <aside class="sidebar">
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+    <aside class="sidebar" id="sidebar-nav">
       <div class="brand">The <span>Knight Club</span></div>
       <nav aria-label="Admin modules">
         <a href="../index.html">Dashboard</a>
@@ -45,6 +46,7 @@
     <main class="main-content" id="main-content" tabindex="-1">
       <div class="topbar">
         <div class="topbar-left">
+          <button type="button" id="menu-toggle" class="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar-nav"><span class="menu-toggle-icon" aria-hidden="true"></span></button>
           <h1 style="margin:0;">Membership</h1>
         </div>
         <div class="topbar-right">
@@ -213,7 +215,7 @@
               max="200"
               step="1"
               placeholder="e.g. 4"
-              aria-describedby="sel-limit-hint sel-limit-warning"
+              aria-describedby="sel-limit-hint selection-limit-warning"
               required
             />
             <p class="hint" id="sel-limit-hint">Number of courses a student must choose when purchasing. Must be ≤ eligible course count.</p>
@@ -468,7 +470,7 @@
         <!-- ================================================================
              SAVE ACTION BAR
              ================================================================ -->
-        <div class="action-bar">
+        <div class="action-bar action-bar-footer">
           <button type="button" id="save-btn" class="btn btn-primary">
             <span class="label">Save Changes</span>
           </button>

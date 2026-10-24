@@ -1,10 +1,11 @@
 /* ==========================================================================
    THE KNIGHT CLUB — Base Styles (Super Admin)
-   Light-dominant cinematic SaaS shell: pale surfaces, restrained ambient
-   purple/blue/pink gradient glows behind the shell, gradient-accented
-   sidebar/active states, glass-inspired card option. Base surfaces stay
-   light/white — the "cinematic" feel comes from accents and depth, not a
-   dark background.
+   Global foundation + app shell + the shared components this file owns:
+   .card, .badge (+ shared badge variants), .toast, .sr-only, .section-tabs.
+   Cream page background, white content surfaces, purple brand accents.
+   All values come from tokens.css — see the ARCHITECTURE RULES there for
+   which file owns which component. Do not redeclare these selectors in a
+   page stylesheet; add a modifier class instead.
    ========================================================================== */
 
 *,
@@ -16,24 +17,58 @@
 body {
   margin: 0;
   font-family: var(--font-family-base);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-body);
   color: var(--color-text);
   background: var(--color-bg);
-  line-height: 1.5;
+  line-height: var(--line-height-base);
   -webkit-font-smoothing: antialiased;
 }
 
 a {
-  color: var(--color-accent-600);
+  color: var(--color-primary-hover);
   text-decoration: none;
 }
 
+/* Heading scale. Element selectors on purpose (lowest specificity): any
+   component or page can size its own heading with a class without a fight. */
 h1, h2, h3, h4, h5, h6 {
   margin: 0 0 var(--space-4);
-  line-height: 1.25;
-  font-weight: 700;
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.01em;
   font-family: var(--font-family-display);
+  color: var(--color-text);
+}
+h1 { font-size: var(--font-size-page-title); }
+h2 { font-size: var(--font-size-section-title); }
+h3 { font-size: var(--font-size-card-title); }
+h4 { font-size: var(--font-size-base); }
+h5, h6 { font-size: var(--font-size-sm); }
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-6) 0;
+}
+
+::selection {
+  background: var(--color-primary-soft);
+  color: var(--color-text);
+}
+
+/* Baseline keyboard focus for anything without its own focus style.
+   Components that define :focus-visible (buttons, inputs, nav) win by
+   specificity — this never overrides them. */
+:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+/* Native checkboxes/radios pick up the brand color; no markup change. */
+input[type="checkbox"],
+input[type="radio"],
+progress {
+  accent-color: var(--color-primary);
 }
 
 .text-muted {
@@ -84,7 +119,7 @@ h1, h2, h3, h4, h5, h6 {
    shell's own ::before/::after free for the two primary glows. */
 .main-content {
   position: relative;
-  padding: var(--space-8);
+  padding: var(--space-page);
   max-width: var(--max-width);
   margin: 0 auto;
   width: 100%;
@@ -131,6 +166,10 @@ h1, h2, h3, h4, h5, h6 {
   height: 100dvh;
   overflow-y: auto;         /* sidebar scrolls on its own if the menu is taller than the screen */
   overscroll-behavior: contain;
+  /* Slim, translucent scrollbar that blends into the purple panel (the
+     default light-grey bar looked out of place). Firefox + WebKit/Blink. */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -148,8 +187,9 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-family-display);
   font-weight: 500;
   font-size: var(--font-size-lg);
-  margin-bottom: var(--space-8);
-  padding: 0 var(--space-2);
+  margin-bottom: var(--space-5);
+  padding: 0 var(--space-2) var(--space-5);
+  border-bottom: 1px solid var(--sidebar-border);
   letter-spacing: 0;
   white-space: nowrap;
   color: var(--sidebar-text);   /* "The": quiet */
@@ -195,12 +235,12 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-3);
+  padding: 0.5625rem var(--space-3);
   border-radius: var(--radius-md);
   color: var(--sidebar-text);
   font-weight: 500;
   font-size: var(--font-size-sm);
-  margin-bottom: var(--space-1);
+  margin-bottom: 2px;
   transition: background var(--duration-fast) var(--ease-standard),
               color var(--duration-fast) var(--ease-standard),
               transform var(--duration-fast) var(--ease-standard);
@@ -324,13 +364,64 @@ h1, h2, h3, h4, h5, h6 {
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 13.5a7.4 7.4 0 0 0 0-3l2-1.6-2-3.4-2.4.8a7.3 7.3 0 0 0-2.6-1.5L14 2h-4l-.4 2.5a7.3 7.3 0 0 0-2.6 1.5l-2.4-.8-2 3.4 2 1.6a7.4 7.4 0 0 0 0 3l-2 1.6 2 3.4 2.4-.8a7.3 7.3 0 0 0 2.6 1.5L10 22h4l.4-2.4a7.3 7.3 0 0 0 2.6-1.5l2.4.8 2-3.4-2-1.6Z'/%3E%3C/svg%3E");
 }
 
+/* ---- Sidebar polish ---- */
+.sidebar nav a:hover {
+  transform: translateX(2px);
+}
+
+/* Active item: brighter surface + a slim white indicator on the panel edge. */
+.sidebar nav a.active {
+  background: linear-gradient(90deg, var(--sidebar-active-bg), var(--sidebar-hover-bg));
+}
+
+.sidebar nav a.active::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--space-4) * -1);
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
+  background: var(--sidebar-text-strong);
+}
+
+/* Icons light up with the label on hover / active. */
+.sidebar nav a.active[href]::before,
+.sidebar nav a[href]:hover::before {
+  background: var(--sidebar-text-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar nav a:hover { transform: none; }
+}
+
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+}
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.35); }
+
+/* Icons for the two modules that had none (Testimonials = video, Members = crown). */
+.sidebar nav a[href$="testimonials.html"]::before {
+  background: var(--sidebar-text);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='6' width='14' height='12' rx='2'/%3E%3Cpath d='m22 8-6 4 6 4V8Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='6' width='14' height='12' rx='2'/%3E%3Cpath d='m22 8-6 4 6 4V8Z'/%3E%3C/svg%3E");
+}
+.sidebar nav a[href$="members.html"]::before {
+  background: var(--sidebar-text);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m2 8 5 4 5-7 5 7 5-4-2 11H4L2 8Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m2 8 5 4 5-7 5 7 5-4-2 11H4L2 8Z'/%3E%3C/svg%3E");
+}
+
 /* ---- Topbar ---- */
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-large);
   flex-wrap: wrap;
 }
 
@@ -338,15 +429,125 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
+/* Left-hand group in the topbar: hamburger button + page title, so the
+   button sits before the title without disturbing .topbar's own
+   space-between/flex-wrap layout (which only expects two children today). */
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.topbar-left h1,
+.topbar-left span {
+  min-width: 0;
+}
+
+/* ---- Hamburger / menu toggle (Phase 2) ----
+   Mobile + tablet only (shown below 1025px, see breakpoint block). Hidden
+   on desktop where the sidebar is permanently visible. Uses the same
+   button sizing language as .btn-outline/.btn-sm elsewhere in the app but
+   is its own class since it's icon-only and always square. */
+.menu-toggle {
+  display: none;               /* desktop default: no drawer, no button */
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-field);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.menu-toggle:hover {
+  background: var(--color-surface-alt);
+}
+
+.menu-toggle:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.menu-toggle-icon,
+.menu-toggle-icon::before,
+.menu-toggle-icon::after {
+  display: block;
+  width: 1.125rem;
+  height: 2px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.menu-toggle-icon {
+  position: relative;
+}
+
+.menu-toggle-icon::before,
+.menu-toggle-icon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+
+.menu-toggle-icon::before { top: -6px; }
+.menu-toggle-icon::after { top: 6px; }
+
+/* Open state: icon morphs hamburger -> X. Driven purely by aria-expanded,
+   which JS keeps in sync with the drawer's real state (no separate class
+   needed, one less thing that can drift out of sync). */
+.menu-toggle[aria-expanded="true"] .menu-toggle-icon {
+  background: transparent;
+}
+.menu-toggle[aria-expanded="true"] .menu-toggle-icon::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+.menu-toggle[aria-expanded="true"] .menu-toggle-icon::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
+/* ---- Drawer backdrop (Phase 2) ----
+   One shared element per page, toggled via .is-open. Sits above page
+   content, below the drawer itself. display:none when closed so it can
+   never intercept clicks or be reached by keyboard/AT. */
+.drawer-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: var(--overlay-dark-mid);
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-standard);
+}
+
+.drawer-backdrop.is-open {
+  display: block;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-backdrop {
+    transition: none;
+  }
+}
+
 /* ---- Card ---- */
 .card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   padding: var(--space-6);
-  transition: box-shadow var(--duration-base) var(--ease-standard),
-              transform var(--duration-base) var(--ease-standard);
+  transition: box-shadow var(--transition-base),
+              transform var(--transition-base);
 }
 
 /* Glass-card utility: semi-transparent white surface with soft blur, used
@@ -355,8 +556,8 @@ h1, h2, h3, h4, h5, h6 {
 .glass-card {
   background: var(--color-glass-surface);
   border: 1px solid var(--color-glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-elevated);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
   padding: var(--space-6);
@@ -368,8 +569,8 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--gradient-feature);
   color: var(--color-white);
   border: none;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-glow);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-elevated);
   padding: var(--space-6);
 }
 
@@ -379,17 +580,23 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .card:hover {
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-elevated);
   }
 }
 
-/* ---- Badge ---- */
+/* ---- Badge (canonical) ----
+   ONE definition for every status pill in the app. Status colors live in
+   the variant classes (.badge-success, .badge-draft, .badge-coupon-*, ...)
+   which only set background/color. Size modifier: .badge-sm (courses.css).
+   Page stylesheets must NOT redeclare .badge. */
 .badge {
   display: inline-block;
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
+  padding: 0.15rem 0.625rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-base);
+  white-space: nowrap;
 }
 
 .badge-success {
@@ -423,111 +630,65 @@ h1, h2, h3, h4, h5, h6 {
    in lockstep instead of each page breaking at a different width.
    ========================================================================== */
 
-/* ---- Tablet (≤1024px): sidebar already collapses to a top nav here, since
-   264px of fixed sidebar meaningfully crowds a portrait tablet or small
-   laptop window before 768px ever hits. ---- */
+/* ---- Tablet (≤1024px): the persistent sidebar is replaced by a left-side
+   slide-in drawer, since 264px of fixed sidebar meaningfully crowds a
+   portrait tablet or small laptop window before 768px ever hits. ---- */
 @media (max-width: 1024px) {
   .app-shell {
     grid-template-columns: 1fr;
   }
 
-  .sidebar {
-    position: relative;     /* tablet/mobile: top nav scrolls away normally */
-    height: auto;
-    overflow-y: visible;
-    align-self: stretch;
-    border-right: none;
-    border-bottom: 1px solid var(--color-border);
-    /* THE bug behind "layout doesn't shrink on mobile": .sidebar is a CSS
-       Grid item (child of .app-shell), and a grid item's default min-width
-       is auto, not 0 — it refuses to shrink below its content's intrinsic
-       width. Its child nav becomes a horizontal-scroll flex row below
-       (flex-wrap: nowrap, 13 links, white-space: nowrap), and WITHOUT this
-       min-width:0 the browser sizes .sidebar (and therefore the shared 1fr
-       grid column, and therefore .main-content/the whole page) to fit all
-       13 unwrapped links in one line — ~1700px — instead of the viewport.
-       .main-content already had this fix (see below); .sidebar did not. */
-    min-width: 0;
-    /* Lets the fade overlays below sit flush against the sidebar's own
-       edges instead of the nav's padded inner edge. */
-    isolation: isolate;
-  }
-
-  /* One scrollable row instead of 13 links wrapping into a ~300px tall block
-     that pushes the actual page content off the first screen. */
-  .sidebar { padding: var(--space-3) var(--space-4); }
-  .sidebar .brand { margin-bottom: var(--space-3); }
-  .sidebar nav {
-    position: relative;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    width: 100%;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    gap: var(--space-1);
-  }
-  .sidebar nav::-webkit-scrollbar { display: none; }
-  .sidebar nav a,
-  .sidebar nav .nav-disabled {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    margin-bottom: 0;
-    scroll-snap-align: start;
-  }
-
-  /* Without min-width:0 a flex child sizes to its content's natural width
-     (here, the full unwrapped nav-link row) before flex-wrap gets a chance
-     to apply, pushing the sidebar/page wider than the viewport. */
-  .sidebar nav a,
-  .sidebar nav .nav-disabled {
-    min-width: 0;
-  }
-
-  /* Scroll affordance: with 13+ links in one unwrapped row, most of the
-     nav sits off-screen to the right with nothing to signal it — no
-     scrollbar (hidden above), no visible cut-off edge, nothing. A soft
-     fade on each edge (overlaid on top of the nav, not part of its flex
-     flow) makes it obvious there's more to swipe to.
-     Base state (before JS runs its first scroll-position check): show
-     only the trailing-edge fade, since the row always starts scrolled to
-     its leftmost position — that's also the correct fallback if JS never
-     runs. assets/js/ui.js then toggles .sidebar-nav-at-start /
-     .sidebar-nav-at-end on .sidebar to keep both fades in sync with the
-     real scroll position as the visitor swipes. */
-  .sidebar::before,
-  .sidebar::after {
-    content: "";
-    position: absolute;
-    top: calc(var(--space-3) + 2.25rem + var(--space-3));
-    bottom: var(--space-3);
-    width: 1.75rem;
-    pointer-events: none;
-    z-index: 2;
-    transition: opacity var(--duration-fast) var(--ease-standard);
-  }
-  /* A same-color-to-transparent fade is invisible here: the sidebar's own
-     background already IS that color, so "fading to it" changes nothing
-     visually. What actually needs to show through the edge is a shadow —
-     a dark, semi-transparent overlay that dims the nav items as they
-     approach the edge, independent of whatever the sidebar's own
-     gradient looks like at that point. */
-  .sidebar::before {
-    left: 0;
-    background: linear-gradient(to right, rgba(8, 4, 24, 0.85), transparent);
-    opacity: 0;
-  }
-  .sidebar::after {
-    right: 0;
-    background: linear-gradient(to left, rgba(8, 4, 24, 0.85), transparent);
-    opacity: 1;
-  }
-  .sidebar:not(.sidebar-nav-at-start)::before { opacity: 1; }
-  .sidebar.sidebar-nav-at-end::after { opacity: 0; }
-
   .main-content {
     min-width: 0;
+  }
+
+  /* The hamburger button only exists where the drawer does. */
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  /* ---- Drawer ----
+     Same element as the desktop sidebar (.sidebar) so there is exactly one
+     nav markup and one set of nav-link/active/hover/icon styles for every
+     breakpoint — only its positioning and visibility change here. Fixed
+     + transform (not display/width) so the slide transition is a single
+     compositor-friendly property and never triggers layout. */
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1300;
+    width: var(--drawer-width);
+    height: 100vh;
+    height: 100dvh;
+    max-width: 100vw;
+    transform: translateX(-100%);
+    transition: transform var(--duration-base) var(--ease-standard);
+    border-right: 1px solid var(--sidebar-border);
+    box-shadow: var(--shadow-xl);
+    /* Closed by default: not just visually hidden off-canvas, but also
+       out of tab order and out of the accessibility tree, so focus and
+       screen-reader users never land on an off-screen drawer. */
+    visibility: hidden;
+    padding-top: calc(var(--space-6) + env(safe-area-inset-top, 0px));
+    padding-left: calc(var(--space-4) + env(safe-area-inset-left, 0px));
+    padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .sidebar.is-open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sidebar {
+      transition: none;
+    }
+  }
+
+  /* Vertically stacked nav inside the drawer (same as desktop — this just
+     restates intent now that .sidebar nav's base rule is the drawer's). */
+  .sidebar nav {
+    overflow-y: auto;
   }
 
   /* Generic 2-column form/filter grids used across pages get breathing room
@@ -555,7 +716,7 @@ h1, h2, h3, h4, h5, h6 {
    shell padding, full-width controls. ---- */
 @media (max-width: 640px) {
   .main-content {
-    padding: var(--space-4);
+    padding: var(--space-default);
   }
 
   /* Generic filter bars and multi-column forms collapse to one column on
@@ -637,11 +798,11 @@ h1, h2, h3, h4, h5, h6 {
   align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-field);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-dropdown);
   font-size: var(--font-size-sm);
 }
 .toast-error { background: var(--color-error-bg); border-color: var(--color-error-border); color: var(--color-error-text-strong); }
@@ -649,18 +810,33 @@ h1, h2, h3, h4, h5, h6 {
 .toast-msg { flex: 1; overflow-wrap: anywhere; }
 .toast-close { background: none; border: 0; color: inherit; font-size: 1.25rem; line-height: 1; cursor: pointer; padding: 0 var(--space-1); }
 .toast-close:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 2px; }
-/* ---- 1% Club badges (Order kind / Enrollment source / Member) ---------- */
+/* ---- Shared badge variants (Order kind / Enrollment source / Member) ----
+   Tokens only: no hardcoded colors, no fallback literals. */
 .badge-kind-membership,
-.badge-source-membership { background: #fff4d6; color: #7a5200; border: 1px solid #f0d58a; font-weight: 600; }
+.badge-source-membership { background: var(--color-warning-bg); color: var(--color-warning-text); border: 1px solid var(--color-warning-border); }
 .badge-kind-course,
-.badge-source-course { background: var(--color-surface-sunken, #f0ecfa); color: var(--color-text-muted, #4b5563); }
-.badge-source-cart { background: #e8f0fe; color: #1d4ed8; }
-.badge-paid { background: var(--color-success-bg, #dcfce7); color: var(--color-success-text, #166534); }
-.badge-refunded { background: #fee2e2; color: #991b1b; }
+.badge-source-course { background: var(--color-surface-sunken); color: var(--color-text-muted); }
+.badge-source-cart { background: var(--color-info-bg); color: var(--color-info-text); }
+.badge-paid { background: var(--color-success-bg); color: var(--color-success-text); }
+.badge-refunded { background: var(--color-error-bg); color: var(--color-error-text-strong); }
 
-/* Membership section tab strip */
-.section-tabs { display: flex; gap: var(--space-2, 0.5rem); margin-bottom: var(--space-4, 1rem); border-bottom: 1px solid var(--color-border, #e5e7eb); }
-.section-tabs a { padding: 0.55rem 1rem; text-decoration: none; color: var(--color-text-muted, #4b5563); font-weight: 600; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-.section-tabs a.active { color: var(--color-text, #211a35); border-bottom-color: var(--color-text, #211a35); }
-.member-courses { display: flex; flex-wrap: wrap; gap: 0.25rem; }
-.member-course-chip { font-size: 0.75rem; padding: 0.1rem 0.5rem; border-radius: 999px; background: var(--color-surface-sunken, #f0ecfa); }
+/* Section tab strip */
+.section-tabs { display: flex; gap: var(--space-2); margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); }
+.section-tabs a { padding: 0.55rem 1rem; text-decoration: none; color: var(--color-text-muted); font-weight: var(--font-weight-semibold); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.section-tabs a.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+.member-courses { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.member-course-chip { font-size: var(--font-size-xs); padding: 0.1rem 0.5rem; border-radius: var(--radius-pill); background: var(--color-surface-sunken); }
+
+/* ---- Utility: visually hidden, still announced by screen readers ----
+   Single definition (previously duplicated in courses/membership/placeholders). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

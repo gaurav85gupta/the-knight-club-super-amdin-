@@ -7,11 +7,11 @@
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/tokens.css" />
-  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/base.css?v=p3" />
   <link rel="stylesheet" href="../assets/css/auth.css" />
-  <link rel="stylesheet" href="../assets/css/courses.css" />
+  <link rel="stylesheet" href="../assets/css/courses.css?v=p4" />
   <link rel="stylesheet" href="../assets/css/coupons.css" />
   <link rel="stylesheet" href="../assets/css/orders.css" />
   <style>html.auth-pending body { visibility: hidden; }</style>
@@ -21,7 +21,8 @@
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
   <div class="app-shell">
-    <aside class="sidebar">
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+    <aside class="sidebar" id="sidebar-nav">
       <div class="brand">The <span>Knight Club</span></div>
       <nav aria-label="Admin modules">
         <a href="../index.html">Dashboard</a>
@@ -41,9 +42,9 @@
       </nav>
     </aside>
 
-    <main class="main-content" id="main-content" tabindex="-1">
+    <main class="main-content listing-page" id="main-content" tabindex="-1">
       <div class="topbar">
-        <span></span>
+        <div class="topbar-left"><button type="button" id="menu-toggle" class="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar-nav"><span class="menu-toggle-icon" aria-hidden="true"></span></button><span></span></div>
         <div class="topbar-right">
           <span id="admin-identity" class="admin-identity"></span>
           <button type="button" id="logout-btn" class="btn btn-outline btn-sm">Sign out</button>

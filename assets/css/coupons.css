@@ -53,7 +53,7 @@
   background: var(--gradient-primary);
 }
 .stat-card .stat-label { font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: var(--space-2); font-weight: 600; }
-.stat-card .stat-value { font-family: var(--font-family-display); font-size: 1.625rem; font-weight: 800; color: var(--color-text); letter-spacing: -0.01em; }
+.stat-card .stat-value { font-family: var(--font-family-display); font-size: var(--font-size-stat); font-weight: var(--font-weight-extrabold); color: var(--color-text); letter-spacing: -0.01em; }
 .stat-card .stat-sub { font-size: 0.8125rem; color: var(--color-text-muted); margin-top: var(--space-1); }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {

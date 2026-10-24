@@ -9,16 +9,24 @@
   <meta http-equiv="Cache-Control" content="no-store" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/tokens.css" />
-  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/base.css?v=p3" />
   <link rel="stylesheet" href="../assets/css/auth.css" />
 </head>
 <body class="auth-page">
 
-  <header class="container site-header">
+  <div class="auth-layout">
+  <aside class="auth-showcase">
     <span class="brand">The <span>Knight Club</span> <small class="brand-tag">Super Admin</small></span>
-  </header>
+    <div class="auth-showcase-copy">
+      <h2>Welcome back.</h2>
+      <p>Manage courses, students, orders and more from one secure workspace.</p>
+    </div>
+    <ul class="auth-modules" aria-label="Modules">
+      <li>Courses</li><li>Students</li><li>Enrollments</li><li>Orders</li><li>Coupons</li><li>Analytics</li>
+    </ul>
+  </aside>
 
   <main class="auth-main">
     <section class="auth-card" aria-labelledby="login-title">
@@ -64,6 +72,7 @@
       </form>
     </section>
   </main>
+  </div>
 
   <script src="../assets/js/config.js"></script>
   <script src="../assets/js/api.js"></script>

@@ -258,34 +258,140 @@ const Ui = (() => {
 })();
 
 /**
- * Sidebar nav scroll affordance (tablet/mobile only).
+ * Responsive navigation (Phase 2): left-side slide-in drawer for mobile and
+ * tablet (≤1024px), replacing the old horizontally-scrolling nav row.
  *
- * Below 1024px the sidebar becomes a single horizontally-scrolling row of
- * 13+ nav links (see base.css @media (max-width: 1024px) .sidebar nav),
- * with no native scrollbar and no other signal that most of the nav sits
- * off-screen. base.css always draws a right-edge shadow by default (the
- * correct state before the first scroll ever happens); this script's job
- * is to keep that in sync as the visitor actually scrolls — fading in a
- * LEFT-edge shadow once scrolled away from the start, and dropping the
- * right-edge shadow once scrolled all the way to the end — by toggling
- * .sidebar-nav-at-start / .sidebar-nav-at-end on .sidebar, which base.css
- * reads. Purely cosmetic, runs on every admin page (no auth/data
- * involved), so it's safe to run unconditionally and before the
- * auth-gated page scripts settle.
+ * Markup expected on every page using the shared shell (see index.html /
+ * pages/*.html, login.html excluded):
+ *   <button class="menu-toggle" id="menu-toggle" type="button"
+ *           aria-label="Open navigation" aria-expanded="false"
+ *           aria-controls="sidebar-nav">...</button>
+ *   <aside class="sidebar" id="sidebar-nav"> ... (unchanged) ... </aside>
+ *   <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+ *
+ * Desktop (>1024px) never opens the drawer — .sidebar is the permanent
+ * column there regardless of this module's state, and the toggle button is
+ * hidden by base.css, so this code simply has nothing to do above that
+ * width other than guarantee the drawer isn't left open from a narrower
+ * viewport (handled by the resize listener below).
+ *
+ * Safe to call more than once: init() is idempotent and only ever attaches
+ * its listeners a single time per page load (early-return via a module-level
+ * flag), matching the no-duplicate-listener / safe-reinit requirement.
  */
-(function initSidebarNavScrollHints() {
-  const nav = document.querySelector('.sidebar nav');
-  if (!nav) return;
+const ResponsiveNav = (() => {
+  let initialized = false;
+  let drawer = null;
+  let toggle = null;
+  let backdrop = null;
+  let isOpen = false;
 
-  function update() {
-    const maxScroll = nav.scrollWidth - nav.clientWidth;
-    const atStart = nav.scrollLeft <= 2;
-    const atEnd = maxScroll <= 2 || nav.scrollLeft >= maxScroll - 2;
-    nav.parentElement.classList.toggle('sidebar-nav-at-start', atStart);
-    nav.parentElement.classList.toggle('sidebar-nav-at-end', atEnd);
+  const DESKTOP_QUERY = '(min-width: 1025px)';
+
+  function focusableElements() {
+    if (!drawer) return [];
+    return Array.from(
+      drawer.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')
+    );
   }
 
-  nav.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', update);
-  update();
+  function trapFocus(e) {
+    if (e.key !== 'Tab') return;
+    const items = focusableElements();
+    if (items.length === 0) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
+  function onKeydown(e) {
+    if (e.key === 'Escape') {
+      close();
+    } else {
+      trapFocus(e);
+    }
+  }
+
+  function open() {
+    if (!drawer || isOpen) return;
+    isOpen = true;
+    drawer.classList.add('is-open');
+    if (backdrop) {
+      backdrop.hidden = false;
+      // Force layout so the opacity transition actually runs instead of
+      // the backdrop just appearing instantly (hidden -> display:block
+      // needs a frame before toggling the opacity-driving class).
+      void backdrop.offsetWidth;
+      backdrop.classList.add('is-open');
+    }
+    toggle.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden'; // lock background scroll while modal
+    document.addEventListener('keydown', onKeydown);
+    const items = focusableElements();
+    (items[0] || drawer).focus();
+  }
+
+  function close({ restoreFocus = true } = {}) {
+    if (!drawer || !isOpen) return;
+    isOpen = false;
+    drawer.classList.remove('is-open');
+    if (backdrop) {
+      backdrop.classList.remove('is-open');
+      backdrop.hidden = true;
+    }
+    toggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', onKeydown);
+    if (restoreFocus) toggle.focus();
+  }
+
+  function toggleDrawer() {
+    if (isOpen) close();
+    else open();
+  }
+
+  function init() {
+    if (initialized) return;
+    drawer = document.getElementById('sidebar-nav') || document.querySelector('.sidebar');
+    toggle = document.getElementById('menu-toggle') || document.querySelector('.menu-toggle');
+    backdrop = document.getElementById('drawer-backdrop') || document.querySelector('.drawer-backdrop');
+    if (!drawer || !toggle) return; // page doesn't use the shared shell (e.g. login)
+
+    initialized = true;
+
+    toggle.addEventListener('click', toggleDrawer);
+    if (backdrop) {
+      backdrop.addEventListener('click', () => close());
+    }
+    // Any nav link click closes the drawer so the next page (or anchor
+    // jump on the same page) doesn't load/scroll with the drawer stuck
+    // open; normal navigation itself is untouched (no preventDefault).
+    drawer.querySelectorAll('nav a').forEach((link) => {
+      link.addEventListener('click', () => close({ restoreFocus: false }));
+    });
+
+    // Crossing into desktop width must never leave the drawer "open" in a
+    // state that fights the now-permanent sidebar; crossing back down must
+    // start closed, not resume whatever it was mid-resize.
+    const mq = window.matchMedia(DESKTOP_QUERY);
+    const onViewportChange = (e) => {
+      if (e.matches) close({ restoreFocus: false });
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onViewportChange);
+    else if (mq.addListener) mq.addListener(onViewportChange); // older Safari
+  }
+
+  return { init };
 })();
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => ResponsiveNav.init());
+} else {
+  ResponsiveNav.init();
+}

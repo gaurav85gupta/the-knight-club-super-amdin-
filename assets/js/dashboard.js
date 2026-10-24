@@ -75,27 +75,33 @@
     { key: 'couponUsage', label: 'Coupon usage', fmt: String },
   ];
 
+  /**
+   * One stat card. PRESENTATION ONLY (Phase 3): the label/value text is exactly
+   * what the page rendered before; `data-stat` + the decorative icon span just
+   * give the stylesheet something to hang the icon on. `stateClass` is
+   * "is-loading" / "is-unavailable" purely for styling.
+   */
+  function buildStatCard(def, value, stateClass) {
+    return Dom.el('div', { class: stateClass ? `stat-card ${stateClass}` : 'stat-card', 'data-stat': def.key }, [
+      Dom.el('div', { class: 'stat-head' }, [
+        Dom.el('div', { class: 'stat-label', text: def.label }),
+        Dom.el('span', { class: 'stat-icon', 'aria-hidden': 'true' }),
+      ]),
+      Dom.el('div', { class: 'stat-value', text: value }),
+    ]);
+  }
+
   function renderStatsLoading() {
     Dom.clear(els.statsGrid);
     for (const def of STAT_DEFS) {
-      els.statsGrid.appendChild(
-        Dom.el('div', { class: 'stat-card' }, [
-          Dom.el('div', { class: 'stat-label', text: def.label }),
-          Dom.el('div', { class: 'stat-value', text: '—' }),
-        ])
-      );
+      els.statsGrid.appendChild(buildStatCard(def, '—', 'is-loading'));
     }
   }
 
   function renderStats(stats) {
     Dom.clear(els.statsGrid);
     if (!stats) {
-      els.statsGrid.appendChild(
-        Dom.el('div', { class: 'stat-card' }, [
-          Dom.el('div', { class: 'stat-label', text: 'Statistics' }),
-          Dom.el('div', { class: 'stat-value', text: 'Unavailable' }),
-        ])
-      );
+      els.statsGrid.appendChild(buildStatCard({ key: 'unavailable', label: 'Statistics' }, 'Unavailable', 'is-unavailable'));
       return;
     }
     for (const def of STAT_DEFS) {
@@ -104,12 +110,7 @@
       // a genuinely missing value falls back to the em dash (spec "ZERO
       // STATE" vs "LOADING STATE").
       const value = Number.isFinite(raw) ? def.fmt(raw) : '—';
-      els.statsGrid.appendChild(
-        Dom.el('div', { class: 'stat-card' }, [
-          Dom.el('div', { class: 'stat-label', text: def.label }),
-          Dom.el('div', { class: 'stat-value', text: value }),
-        ])
-      );
+      els.statsGrid.appendChild(buildStatCard(def, value));
     }
   }
 

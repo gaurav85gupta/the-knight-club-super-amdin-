@@ -7,130 +7,204 @@
    wider screens add to it.
    ========================================================================== */
 
-.container { width: 100%; max-width: var(--max-width); margin: 0 auto; padding-left: var(--space-4); padding-right: var(--space-4); }
-
-/* ---- Header on the login page ---- */
-.site-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: var(--space-6);
-  padding-bottom: var(--space-6);
-  gap: var(--space-4);
-}
-.brand {
-  font-weight: 800;
-  font-size: var(--font-size-xl);
-  color: var(--color-text);
-  letter-spacing: -0.02em;
-}
-.brand span { color: var(--color-accent-500); }
-.brand-tag {
-  display: inline-block;
-  margin-left: var(--space-2);
-  padding: 0.1rem 0.55rem;
-  border-radius: var(--radius-full);
-  background: var(--color-accent-50);
-  color: var(--color-accent-700);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  vertical-align: middle;
-}
-
-/* ---- Page shell ---- */
+/* ---- Login page: split layout (brand showcase + sign-in panel) ----
+   Selectors below are used by pages/login.html only. */
 .auth-page {
-  position: relative;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-x: clip;
   background: var(--color-bg);
 }
+.auth-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
 
-/* Restrained ambient glows echoing the app shell, scaled for a single
-   focused card — decorative, inert, no horizontal overflow. */
-.auth-page::before,
-.auth-page::after {
+/* Brand showcase: deep purple panel. Mobile = compact banner, desktop = left half. */
+.auth-showcase {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: var(--space-6) var(--space-6);
+  background: var(--sidebar-bg);
+  color: var(--color-white);
+}
+/* Decorative concentric rings — inert, no layout impact. */
+.auth-showcase::before,
+.auth-showcase::after {
   content: "";
-  position: fixed;
+  position: absolute;
   z-index: -1;
   pointer-events: none;
   border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.18;
+  border: 1px solid var(--overlay-light-faint);
 }
-.auth-page::before {
-  width: 38rem;
-  height: 38rem;
-  top: -16rem;
-  left: 50%;
-  transform: translateX(-62%);
-  background: var(--gradient-ambient-1);
+.auth-showcase::before { width: 28rem; height: 28rem; right: -9rem; bottom: -10rem; }
+.auth-showcase::after  { width: 44rem; height: 44rem; right: -17rem; bottom: -18rem; }
+
+.auth-showcase .brand {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 0.3em;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0;
+  color: var(--sidebar-text);
 }
-.auth-page::after {
-  width: 30rem;
-  height: 30rem;
-  bottom: -14rem;
-  right: -8rem;
-  background: var(--gradient-ambient-3);
+.auth-showcase .brand::before {
+  content: "K";
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: var(--space-3);
+  border-radius: var(--radius-field);
+  background: var(--color-white);
+  color: var(--color-primary);
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-extrabold);
+}
+.auth-showcase .brand span { color: var(--color-white); font-weight: var(--font-weight-bold); }
+.auth-showcase .brand-tag {
+  margin-left: var(--space-2);
+  background: var(--sidebar-active-bg);
+  color: var(--color-white);
 }
 
+.auth-showcase-copy { display: none; }
+.auth-showcase-copy h2 {
+  margin: 0 0 var(--space-4);
+  font-size: 2.25rem;
+  line-height: 1.2;
+  color: var(--color-white);
+}
+.auth-showcase-copy p {
+  margin: 0;
+  max-width: 26rem;
+  color: var(--sidebar-text);
+  line-height: var(--line-height-relaxed);
+}
+.auth-modules {
+  display: none;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.auth-modules li {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--sidebar-border);
+  border-radius: var(--radius-pill);
+  background: var(--sidebar-hover-bg);
+  color: var(--sidebar-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Sign-in panel */
 .auth-main {
-  flex: 1;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: var(--space-4) var(--space-4) var(--space-16);
+  padding: var(--space-8) var(--space-4) var(--space-12);
 }
 .auth-card {
-  position: relative;
-  z-index: 1;
   width: 100%;
-  max-width: 440px;
-  background: var(--color-glass-surface);
-  border: 1px solid var(--color-glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  padding: var(--space-6);
+  max-width: 26rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
-.auth-card h1 { font-size: var(--font-size-xl); margin-bottom: var(--space-2); }
-.auth-card .lead { color: var(--color-text-muted); margin-bottom: var(--space-6); }
+.auth-card h1 {
+  font-size: var(--font-size-section-title);
+  margin-bottom: var(--space-2);
+}
+.auth-card .lead {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin: 0 0 var(--space-8);
+}
+.auth-card .form-grid { gap: var(--space-5); }
+.auth-card .input { padding: 0.8rem 1rem; background: var(--color-surface); }
+.auth-card .btn-primary { padding: 0.9rem 1.25rem; font-size: var(--font-size-base); }
 
-@media (prefers-reduced-motion: reduce) {
-  .auth-page::before,
-  .auth-page::after { opacity: 0.12; }
+@media (min-width: 960px) {
+  .auth-layout { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+  .auth-showcase { padding: var(--space-12); }
+  .auth-showcase-copy { display: block; }
+  .auth-modules { display: flex; }
+  .auth-main { padding: var(--space-12); background: var(--color-bg); }
+  .auth-card {
+    padding: var(--space-10);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-elevated);
+  }
 }
 
 /* ---- Form primitives ---- */
 .form-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
 .field { display: flex; flex-direction: column; gap: var(--space-1); }
-.field label { font-weight: 600; font-size: var(--font-size-sm); color: var(--color-text); }
+.field label { font-weight: var(--font-weight-semibold); font-size: var(--font-size-label); color: var(--color-text); overflow-wrap: anywhere; }
+/* Required-field indicator: driven entirely by the existing `required`
+   attribute already present on inputs/selects/textareas — no markup change.
+   Matches the label it directly precedes, so it never marks hints or
+   unrelated text as required. */
+.field:has(> input:required) > label::after,
+.field:has(> select:required) > label::after,
+.field:has(> textarea:required) > label::after {
+  content: " *";
+  color: var(--color-error-text);
+  font-weight: var(--font-weight-regular);
+}
 
 .input {
   width: 100%;
+  max-width: 100%;
   padding: 0.7rem 0.85rem;
   font: inherit;
   color: var(--color-text);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  transition: border-color var(--duration-fast) var(--ease-standard),
-              box-shadow var(--duration-fast) var(--ease-standard);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-field);
+  transition: border-color var(--transition-fast),
+              box-shadow var(--transition-fast),
+              background-color var(--transition-fast);
   /* 16px minimum stops iOS Safari from zooming the page on focus */
   font-size: 1rem;
 }
+.input::placeholder { color: var(--color-text-faint); opacity: 1; }
 .input:hover { border-color: var(--color-accent-300); }
 .input:focus {
   outline: none;
   border-color: var(--focus-ring-color);
   box-shadow: var(--focus-ring);
 }
-.field.has-error .input { border-color: var(--color-error-text); box-shadow: 0 0 0 3px var(--color-error-bg); }
-.field-error { color: var(--color-error-text); font-size: 0.8125rem; margin: 0; min-height: 0; }
+/* Disabled / read-only: clearly inert, but text stays readable (AA). */
+.input:disabled,
+.input[readonly] {
+  background: var(--color-surface-alt);
+  border-color: var(--color-border-warm);
+  color: var(--color-text-muted);
+}
+.input:disabled { cursor: not-allowed; }
+.input:disabled:hover,
+.input[readonly]:hover { border-color: var(--color-border-warm); }
+/* Error: red border + red halo — visually distinct from the purple focus ring.
+   .has-error is set by shared JS; aria-invalid by catalog-page.js. */
+.field.has-error .input,
+.input[aria-invalid="true"] { border-color: var(--color-error-text); box-shadow: 0 0 0 3px var(--color-error-bg); }
+.field.has-error .input:focus,
+.input[aria-invalid="true"]:focus { border-color: var(--color-error-text); box-shadow: 0 0 0 3px var(--color-error-border); }
+.field-error { color: var(--color-error-text); font-size: var(--font-size-helper); margin: 0; min-height: 0; overflow-wrap: anywhere; }
 
 /* Password field with show/hide toggle */
 .password-wrap { position: relative; }
@@ -146,11 +220,11 @@
   font: inherit;
   font-size: var(--font-size-sm);
   font-weight: 600;
-  color: var(--color-accent-600);
+  color: var(--color-primary-hover);
   cursor: pointer;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-control);
 }
-.toggle-password:hover { background: var(--color-accent-50); }
+.toggle-password:hover { background: var(--color-primary-softer); }
 .toggle-password:focus-visible { outline: 2px solid var(--color-accent-500); }
 
 /* ---- Buttons ---- */
@@ -161,40 +235,53 @@
   padding: 0.75rem 1.25rem;
   font-family: var(--font-family-display);
   font-size: var(--font-size-sm);
-  font-weight: 600;
-  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  text-align: center;
+  text-decoration: none;
+  border-radius: var(--radius-field);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-standard),
-              box-shadow var(--duration-fast) var(--ease-standard),
-              transform var(--duration-fast) var(--ease-standard),
-              border-color var(--duration-fast) var(--ease-standard),
-              color var(--duration-fast) var(--ease-standard);
+  transition: background var(--transition-fast),
+              box-shadow var(--transition-fast),
+              transform var(--transition-fast),
+              border-color var(--transition-fast),
+              color var(--transition-fast);
 }
 
-/* Primary: gradient fill + accent glow shadow, lifts slightly on hover. */
+/* Primary: brand purple (subtle same-hue gradient), low tinted shadow. */
 .btn-primary {
   background: var(--gradient-primary);
   color: var(--color-text-on-accent);
   box-shadow: var(--shadow-glow-sm);
 }
 .btn-primary:hover { background: var(--gradient-primary-hover); box-shadow: var(--shadow-glow); }
-.btn-primary:active { transform: translateY(1px); box-shadow: var(--shadow-glow-sm); }
+.btn-primary:active { background: var(--color-primary-active); transform: translateY(1px); box-shadow: var(--shadow-glow-sm); }
 
-/* Secondary: solid neutral surface, for the second-priority action. */
+/* Secondary: neutral filled surface, for the second-priority action. */
 .btn-secondary { background: var(--color-surface-sunken); color: var(--color-text); border-color: var(--color-border); }
 .btn-secondary:hover { background: var(--color-border); }
+.btn-secondary:active { background: var(--color-border-strong); }
 
-.btn-outline { background: transparent; color: var(--color-accent-700); border-color: var(--color-accent-300); }
-.btn-outline:hover { background: var(--color-accent-50); }
+.btn-outline { background: transparent; color: var(--color-primary-active); border-color: var(--color-accent-300); }
+.btn-outline:hover { background: var(--color-primary-softer); border-color: var(--color-primary); }
+.btn-outline:active { background: var(--color-primary-soft); }
 
 .btn-ghost { background: transparent; color: var(--color-text-muted); border-color: transparent; }
 .btn-ghost:hover { background: var(--color-surface-alt); color: var(--color-text); }
+.btn-ghost:active { background: var(--color-border-warm); }
 
 .btn-sm { padding: var(--space-2) var(--space-4); font-size: var(--font-size-sm); }
 .btn-block { width: 100%; }
 .btn:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 2px; }
-.btn[disabled] { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+/* Disabled: dimmed + inert. The :hover form keeps the lift/gradient from
+   leaking onto a disabled button (hover rules below would otherwise win). */
+.btn[disabled],
+.btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-primary[disabled]:hover,
+.btn-secondary[disabled]:hover,
+.btn-outline[disabled]:hover { transform: none; box-shadow: none; }
+.btn-primary[disabled]:hover { background: var(--gradient-primary); }
 .btn .spinner {
   width: 1em;
   height: 1em;
@@ -216,16 +303,17 @@
 
 /* ---- Alerts ---- */
 .alert {
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-field);
   padding: var(--space-3) var(--space-4);
   font-size: var(--font-size-sm);
   margin-bottom: var(--space-4);
   border: 1px solid transparent;
+  overflow-wrap: anywhere;
 }
 .alert[hidden] { display: none; }
 .alert:focus { outline: none; }
 .alert-error { background: var(--color-error-bg); border-color: var(--color-error-border); color: var(--color-error-text-strong); }
-.alert-info  { background: var(--color-surface-alt); border-color: var(--color-border); color: var(--color-text); }
+.alert-info  { background: var(--color-info-bg); border-color: var(--color-info-border); color: var(--color-info-text); }
 
 /* ---- Guarded shell: hidden until the SERVER confirms the session, so an
         unauthenticated visitor never sees a flash of admin UI. ---- */
@@ -250,10 +338,10 @@ html.auth-pending body { visibility: hidden; }
   padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
   border-radius: var(--radius-full);
   background: var(--color-surface-alt);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-warm);
   color: var(--color-text);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   max-width: 16rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -271,15 +359,9 @@ html.auth-pending body { visibility: hidden; }
 
 .admin-identity:empty { display: none; }
 
-@media (min-width: 640px) {
-  .auth-main { padding-top: var(--space-8); }
-  .auth-card { padding: var(--space-8); }
-}
-/* Extreme-narrow tier (iPhone SE class, ~320-375px) — not part of the app's
-   standard mobile/tablet/desktop breakpoints (see tokens.css --bp-*), only
-   used here to shave card padding on the smallest real devices. */
+/* Extreme-narrow tier (iPhone SE class, ~320-375px): tighter showcase padding. */
 @media (max-width: 380px) {
-  .auth-card { padding: var(--space-4); }
+  .auth-showcase { padding: var(--space-4); }
 }
 @media (prefers-reduced-motion: reduce) {
   .btn .spinner { animation-duration: 2s; }

@@ -123,3 +123,402 @@
    only the first two columns (names / course titles) may wrap. */
 .dashboard-section .table th:nth-child(n+3),
 .dashboard-section .table td:nth-child(n+3) { white-space: nowrap; }
+
+
+/* ==========================================================================
+   PHASE 3 — DASHBOARD REDESIGN (index.html only)
+   Everything below is scoped to `.dashboard-page` (the <main> of index.html)
+   because pages/analytics.html also loads this file and reuses
+   .dashboard-stats-grid / .dashboard-error-note; the rules ABOVE stay as
+   they were so that page is unchanged (its redesign belongs to Phase 6).
+   Tokens only (tokens.css). Layout is driven by CONTAINER width, not
+   viewport width, because the sidebar (Phase 2) takes 264px from the content
+   area above 1024px and nothing from it below — a viewport breakpoint can't
+   know how much room the cards really have.
+   ========================================================================== */
+
+/* ---- Header ---- */
+.dashboard-page .dashboard-header {
+  margin-bottom: var(--space-8);
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.dashboard-page .dashboard-heading {
+  min-width: 0;
+}
+
+.dashboard-page .dashboard-heading h1 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-page .dashboard-subtitle {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-base);
+}
+
+@media (max-width: 640px) {
+  .dashboard-page .dashboard-header {
+    align-items: stretch;
+    margin-bottom: var(--space-6);
+  }
+  .dashboard-page .dashboard-header .topbar-right {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+  .dashboard-page .dashboard-header .admin-identity {
+    min-width: 0;
+  }
+}
+
+/* ---- Stat cards ----
+   Host element is the container; the grid inside adapts to ITS width:
+     < 30rem  : 1 column, compact (icon left, label + value right)
+     >= 30rem : 2 columns
+     >= 52rem : 4 columns (8 cards => two even rows, never 5 + 3)
+   The base auto-fit rule above remains as the fallback for browsers
+   without container queries. */
+.dashboard-page .dashboard-stats {
+  container-type: inline-size;
+  container-name: dash-stats;
+  margin-bottom: var(--space-8);
+}
+
+.dashboard-page .dashboard-stats-grid {
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+  margin-bottom: 0;
+}
+
+@container dash-stats (min-width: 30rem) {
+  .dashboard-page .dashboard-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+@container dash-stats (min-width: 52rem) {
+  .dashboard-page .dashboard-stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Browsers without container queries: keep the original responsive grid. */
+@supports not (container-type: inline-size) {
+  .dashboard-page .dashboard-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+.dashboard-page .stat-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "icon label"
+    "icon value";
+  column-gap: var(--space-4);
+  row-gap: var(--space-1);
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* The shared 3px gradient accent bar and hover-lift (coupons.css) suit the
+   small detail-page cards; on the dashboard the icon chip carries the brand
+   accent, and these cards aren't interactive, so they stay still. */
+.dashboard-page .stat-card::before { display: none; }
+.dashboard-page .stat-card:hover { transform: none; box-shadow: var(--shadow-card); }
+
+/* .stat-head only groups label + icon in the markup; let them be grid items. */
+.dashboard-page .stat-head { display: contents; }
+
+.dashboard-page .stat-card .stat-label {
+  grid-area: label;
+  margin: 0;
+  min-width: 0;
+  line-height: var(--line-height-tight);
+  overflow-wrap: anywhere;
+}
+
+.dashboard-page .stat-card .stat-value {
+  grid-area: value;
+  min-width: 0;
+  /* Scales with the card grid so 7-8 digit revenue never clips, capped at
+     the Phase 1 stat size. */
+  font-size: clamp(1.25rem, 2.6cqi, var(--font-size-stat));
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-page .stat-icon {
+  grid-area: icon;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.dashboard-page .stat-icon::before {
+  content: "";
+  width: 1.25rem;
+  height: 1.25rem;
+  background: currentColor;
+  -webkit-mask: var(--stat-icon) center / contain no-repeat;
+  mask: var(--stat-icon) center / contain no-repeat;
+  /* default glyph: bars */
+  --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19V9M11 19V4M18 19v-6'/%3E%3C/svg%3E");
+}
+
+.dashboard-page .stat-card[data-stat="totalStudents"] .stat-icon::before { --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 9 12 4 2 9l10 5 10-5Z'/%3E%3Cpath d='M6 11v5c0 1.1 2.7 2.5 6 2.5s6-1.4 6-2.5v-5'/%3E%3C/svg%3E"); }
+.dashboard-page .stat-card[data-stat="totalCourses"] .stat-icon::before { --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19.5A2.5 2.5 0 0 1 6.5 17H20'/%3E%3Cpath d='M6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5v-13A2.5 2.5 0 0 1 6.5 3Z'/%3E%3C/svg%3E"); }
+.dashboard-page .stat-card[data-stat="publishedCourses"] .stat-icon::before { --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z'/%3E%3Cpath d='M14 3v5h5'/%3E%3Cpath d='m9 14.5 2 2 4-4'/%3E%3C/svg%3E"); }
+.dashboard-page .stat-card[data-stat="totalEnrollments"] .stat-icon::before { --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 11.5 11 13.5 15.5 9'/%3E%3Crect x='3' y='4' width='18' height='17' rx='2'/%3E%3Cpath d='M3 9h18'/%3E%3C/svg%3E"); }
+.dashboard-page .stat-card[data-stat="totalOrders"] .stat-icon::before { --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='20' r='1.25'/%3E%3Ccircle cx='17' cy='20' r='1.25'/%3E%3Cpath d='M2.5 3h2.5l2.4 12.1A2 2 0 0 0 9.3 17H17a2 2 0 0 0 2-1.6L20.8 7H6'/%3E%3C/svg%3E"); }
+.dashboard-page .stat-card[data-stat="successfulPayments"] .stat-icon::before { --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='5' width='20' height='14' rx='2'/%3E%3Cpath d='M2 10h20M6 15h4'/%3E%3C/svg%3E"); }
+.dashboard-page .stat-card[data-stat="revenue"] .stat-icon::before { --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 4h12M6 9h12'/%3E%3Cpath d='M8.5 4c5.5 0 5.5 9.5 0 9.5H6l9 7'/%3E%3C/svg%3E"); }
+.dashboard-page .stat-card[data-stat="couponUsage"] .stat-icon::before { --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.6 12.6 13.4 19.8a2 2 0 0 1-2.8 0L3 12.2V3h9.2l8.4 8.4a2 2 0 0 1 0 2.8Z'/%3E%3Ccircle cx='7.5' cy='7.5' r='1.5'/%3E%3C/svg%3E"); }
+
+/* Roomier cards: label + icon on one row, value below (>= 2 columns). */
+@container dash-stats (min-width: 30rem) {
+  .dashboard-page .stat-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "label icon"
+      "value value";
+    align-items: start;
+    row-gap: var(--space-3);
+    padding: var(--space-5);
+  }
+  .dashboard-page .stat-card .stat-label { padding-top: var(--space-2); }
+}
+
+/* Loading: same card, muted placeholder dash (text itself is unchanged). */
+.dashboard-page .stat-card.is-loading .stat-value { color: var(--color-text-faint); }
+
+/* Whole-block fallback when stats couldn't be loaded. */
+.dashboard-page .stat-card.is-unavailable { grid-column: 1 / -1; }
+.dashboard-page .stat-card.is-unavailable .stat-value {
+  font-size: var(--font-size-lg);
+  color: var(--color-error-text);
+}
+
+/* ---- Recent-record sections ----
+   Card padding moves to the parts so the table can run edge-to-edge and the
+   header gets a divider. Container width decides the layout:
+     < 62rem  : single column, all sections full width
+     >= 62rem : tables stack in a 2fr column, activity is a 1fr side rail */
+.dashboard-page .dashboard-body {
+  container-type: inline-size;
+  container-name: dash-body;
+}
+
+.dashboard-page .dashboard-sections {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@container dash-body (min-width: 62rem) {
+  .dashboard-page .dashboard-sections {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+  .dashboard-page .dashboard-section { grid-column: 1; }
+  .dashboard-page .dashboard-section--activity { grid-column: 2; grid-row: 1 / span 3; }
+}
+
+/* Fallback (no container queries): the pre-Phase-3 behavior — one column. */
+
+.dashboard-page .dashboard-section {
+  padding: 0;
+  overflow: hidden;
+}
+
+.dashboard-page .dashboard-section-title {
+  margin: 0;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-3);
+}
+
+.dashboard-page .dashboard-section-title h2 {
+  font-size: var(--font-size-card-title);
+  min-width: 0;
+}
+
+.dashboard-page .dashboard-section-title a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-2);
+  margin-right: calc(var(--space-2) * -1);
+  border-radius: var(--radius-control);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.dashboard-page .dashboard-section-title a::after {
+  content: "";
+  width: 0.875rem;
+  height: 0.875rem;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.dashboard-page .dashboard-section-title a:hover {
+  background: var(--color-primary-softer);
+  color: var(--color-primary-active);
+}
+
+/* ---- Tables ---- */
+.dashboard-page .dashboard-section .table th,
+.dashboard-page .dashboard-section .table td {
+  padding: var(--space-3) var(--space-4);
+}
+
+.dashboard-page .dashboard-section .table th:first-child,
+.dashboard-page .dashboard-section .table td:first-child { padding-left: var(--space-6); }
+.dashboard-page .dashboard-section .table th:last-child,
+.dashboard-page .dashboard-section .table td:last-child { padding-right: var(--space-6); }
+
+/* Names / titles may wrap (and break long unbroken strings) instead of
+   forcing the table wider; short scannable columns stay on one line (the
+   nowrap rule from the base block above). */
+.dashboard-page .dashboard-section .table td:nth-child(-n+2) {
+  overflow-wrap: anywhere;
+  min-width: 7rem;
+}
+
+.dashboard-page .dashboard-section .table td:first-child { font-weight: var(--font-weight-semibold); }
+
+.dashboard-page .dashboard-section .table td:last-child {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Orders: amount is the key figure — right-aligned, tabular, stronger. */
+.dashboard-page .dashboard-section--orders .table th:nth-child(3),
+.dashboard-page .dashboard-section--orders .table td:nth-child(3) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.dashboard-page .dashboard-section--orders .table td:nth-child(3) { font-weight: var(--font-weight-semibold); }
+
+/* Students: the User ID is an identifier, not prose. */
+.dashboard-page #recent-students-body td:nth-child(2) {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: var(--font-size-helper);
+  color: var(--color-text-muted);
+}
+
+/* A status with no dedicated badge colour (e.g. an enrollment "Completed")
+   falls back to the neutral chip instead of bare text. :where() keeps the
+   specificity at zero so every real .badge-* variant still wins. */
+:where(.dashboard-section .badge) {
+  background: var(--color-surface-sunken);
+  color: var(--color-text-muted);
+}
+
+/* ---- Loading / empty / error ---- */
+.dashboard-page .dashboard-section .state-box {
+  padding: var(--space-8) var(--space-6);
+  font-size: var(--font-size-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+.dashboard-page .dashboard-section .state-box p { margin: 0; }
+
+/* Activity list has no header row above its state box — no divider needed. */
+.dashboard-page .dashboard-section--activity .state-box { border-top: 0; }
+
+.dashboard-page .dashboard-error-note {
+  display: inline-block;
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--radius-field);
+  background: var(--color-error-bg);
+  color: var(--color-error-text-strong);
+  font-size: var(--font-size-sm);
+}
+
+/* ---- Recent activity ----
+   Timeline-style rows; becomes two columns when the card is wide (stacked
+   layout) and stays a single column in the side rail. */
+.dashboard-page .activity-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: var(--space-8);
+  padding: var(--space-2) var(--space-6);
+}
+
+.dashboard-page .dashboard-section--activity { container-type: inline-size; container-name: dash-activity; }
+
+@container dash-activity (min-width: 40rem) {
+  .dashboard-page .activity-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Even count: the left item of the last row would otherwise keep its divider. */
+  .dashboard-page .activity-item:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
+}
+
+.dashboard-page .activity-item {
+  position: relative;
+  padding: var(--space-3) 0 var(--space-3) var(--space-5);
+  min-width: 0;
+}
+
+.dashboard-page .activity-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(var(--space-3) + 0.4rem);
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.dashboard-page .activity-item-top {
+  flex-wrap: wrap;
+  column-gap: var(--space-3);
+  row-gap: 0;
+}
+
+.dashboard-page .activity-time {
+  font-size: var(--font-size-helper);
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-page .activity-meta {
+  font-size: var(--font-size-helper);
+  overflow-wrap: anywhere;
+}
+
+/* ---- Small screens ---- */
+@media (max-width: 640px) {
+  .dashboard-page .dashboard-stats { margin-bottom: var(--space-6); }
+  .dashboard-page .dashboard-sections { gap: var(--space-4); }
+  .dashboard-page .dashboard-section-title { padding: var(--space-3) var(--space-4); }
+  .dashboard-page .dashboard-section .table th:first-child,
+  .dashboard-page .dashboard-section .table td:first-child { padding-left: var(--space-4); }
+  .dashboard-page .dashboard-section .table th:last-child,
+  .dashboard-page .dashboard-section .table td:last-child { padding-right: var(--space-4); }
+  .dashboard-page .dashboard-section .state-box { padding: var(--space-6) var(--space-4); }
+  /* Keep real column widths and let .table-wrap scroll sideways inside the
+     card (existing app pattern) rather than squeezing words mid-letter. */
+  .dashboard-page .dashboard-section .table { min-width: 32rem; }
+  .dashboard-page .activity-list { padding-left: var(--space-4); padding-right: var(--space-4); }
+}

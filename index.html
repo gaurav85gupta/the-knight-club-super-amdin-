@@ -7,14 +7,15 @@
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/tokens.css" />
-  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/base.css?v=p3" />
   <link rel="stylesheet" href="assets/css/auth.css" />
   <link rel="stylesheet" href="assets/css/courses.css" />
   <link rel="stylesheet" href="assets/css/coupons.css" />
   <link rel="stylesheet" href="assets/css/orders.css" />
-  <link rel="stylesheet" href="assets/css/dashboard.css" />
+  <link rel="stylesheet" href="assets/css/students.css?v=p3" />
+  <link rel="stylesheet" href="assets/css/dashboard.css?v=p3" />
   <!-- PROTECTED SHELL. Hidden until the SERVER confirms an administrator
        session, so an unauthenticated visitor never sees a flash of admin UI.
        (The <noscript> rule below keeps the page from being a blank screen
@@ -29,7 +30,8 @@
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
   <div class="app-shell">
-    <aside class="sidebar">
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+    <aside class="sidebar" id="sidebar-nav">
       <div class="brand">The <span>Knight Club</span></div>
       <nav aria-label="Admin modules">
         <a href="index.html" class="active" aria-current="page">Dashboard</a>
@@ -50,9 +52,15 @@
       </nav>
     </aside>
 
-    <main class="main-content" id="main-content" tabindex="-1">
-      <div class="topbar">
-        <h1 style="margin:0;">Dashboard</h1>
+    <main class="main-content dashboard-page" id="main-content" tabindex="-1">
+      <div class="topbar dashboard-header">
+        <div class="topbar-left">
+          <button type="button" id="menu-toggle" class="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar-nav"><span class="menu-toggle-icon" aria-hidden="true"></span></button>
+          <div class="dashboard-heading">
+            <h1>Dashboard</h1>
+            <p class="dashboard-subtitle">Platform overview and recent activity</p>
+          </div>
+        </div>
         <div class="topbar-right">
           <span id="admin-identity" class="admin-identity"></span>
           <button type="button" id="logout-btn" class="btn btn-outline btn-sm">Sign out</button>
@@ -62,33 +70,15 @@
       <div id="page-alert" class="alert" role="alert" tabindex="-1" hidden></div>
 
       <!-- ---- Summary statistics (spec Sections 1-8) ---- -->
-      <div class="dashboard-stats-grid" id="stats-grid" aria-live="polite"></div>
+      <section class="dashboard-stats" aria-label="Summary statistics">
+        <div class="dashboard-stats-grid" id="stats-grid" aria-live="polite"></div>
+      </section>
 
       <!-- ---- Recent sections (spec Sections 9-12) ---- -->
+      <div class="dashboard-body">
       <div class="dashboard-sections">
 
-        <section class="card dashboard-section">
-          <div class="dashboard-section-title">
-            <h2>Recent students</h2>
-            <a href="pages/students.html">View all</a>
-          </div>
-          <div class="table-wrap">
-            <table class="table" aria-label="Recent students">
-              <thead>
-                <tr>
-                  <th scope="col">Name</th>
-                  <th scope="col">User ID</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Joined</th>
-                </tr>
-              </thead>
-              <tbody id="recent-students-body"></tbody>
-            </table>
-          </div>
-          <div id="recent-students-state" class="state-box" hidden></div>
-        </section>
-
-        <section class="card dashboard-section">
+        <section class="card dashboard-section dashboard-section--orders">
           <div class="dashboard-section-title">
             <h2>Recent orders</h2>
             <a href="pages/orders.html">View all</a>
@@ -133,12 +123,34 @@
 
         <section class="card dashboard-section">
           <div class="dashboard-section-title">
+            <h2>Recent students</h2>
+            <a href="pages/students.html">View all</a>
+          </div>
+          <div class="table-wrap">
+            <table class="table" aria-label="Recent students">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">User ID</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Joined</th>
+                </tr>
+              </thead>
+              <tbody id="recent-students-body"></tbody>
+            </table>
+          </div>
+          <div id="recent-students-state" class="state-box" hidden></div>
+        </section>
+
+        <section class="card dashboard-section dashboard-section--activity">
+          <div class="dashboard-section-title">
             <h2>Recent activity</h2>
           </div>
           <ul class="activity-list" id="recent-activity-list" aria-label="Recent admin activity"></ul>
           <div id="recent-activity-state" class="state-box" hidden></div>
         </section>
 
+      </div>
       </div>
     </main>
   </div>
@@ -150,6 +162,6 @@
   <script src="assets/js/dom.js"></script>
   <script src="assets/js/ui.js"></script>
   <script src="assets/js/dashboard-api.js"></script>
-  <script src="assets/js/dashboard.js"></script>
+  <script src="assets/js/dashboard.js?v=p3"></script>
 </body>
 </html>

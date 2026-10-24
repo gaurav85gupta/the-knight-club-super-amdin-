@@ -12,11 +12,11 @@
 
 /* ---- Type badges (PHOTO / VIDEO / WRITTEN) ---- */
 .badge-type-photo   { background: var(--color-surface-sunken); color: var(--color-text-muted); }
-.badge-type-video   { background: #e8f0fe; color: #1d4ed8; }
-.badge-type-written { background: #fff4d6; color: #7a5200; }
+.badge-type-video   { background: var(--color-info-bg); color: var(--color-info-text); }
+.badge-type-written { background: var(--color-warning-bg); color: var(--color-warning-text); }
 
 /* ---- Featured badge ---- */
-.badge-featured { background: var(--gradient-primary, #f0ecfa); color: var(--color-white); }
+.badge-featured { background: var(--gradient-primary); color: var(--color-white); }
 .badge-not-featured { background: var(--color-surface-sunken); color: var(--color-text-muted); }
 
 /* ---- Row media preview (small thumbnail / video / written indicator) ---- */
@@ -59,9 +59,9 @@
   min-width: 8rem;
 }
 .type-selector button[aria-pressed="true"] {
-  background: var(--color-primary, #6d28d9);
+  background: var(--color-primary);
   color: var(--color-white);
-  border-color: var(--color-primary, #6d28d9);
+  border-color: var(--color-primary);
 }
 
 /* ---- Type-specific form panels ---- */

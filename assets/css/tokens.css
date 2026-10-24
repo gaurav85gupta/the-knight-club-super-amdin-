@@ -1,151 +1,212 @@
 /* ==========================================================================
    THE KNIGHT CLUB — Design Tokens (Super Admin)
-   Theme: light-dominant cinematic SaaS — clean pale/white surfaces, with a
-   purple / electric-blue / soft-pink accent system used for gradients,
-   active states and restrained ambient background glows. NOT a dark theme:
-   base surfaces stay light for table/form readability. No light/dark mode
-   toggle exists or is introduced here — this is the single active palette.
-   These custom properties are the single source of truth for color,
-   spacing, radius, shadow, gradients and motion across the app. Never
-   hardcode a color/shadow/gradient value in a page-level stylesheet —
-   reference a token instead.
+   Theme: premium SaaS — PURPLE brand, WHITE content surfaces, CREAM page
+   background, restrained neutrals. Not a dark theme; no theme toggle exists.
+
+   ARCHITECTURE RULES (read before adding CSS anywhere in this app)
+   1. This file is the SINGLE source of truth for color, type, spacing,
+      radius, shadow and motion. No other stylesheet defines a palette.
+      Never hardcode a hex/rgba value in a component or page stylesheet.
+   2. Two layers:
+        a) PRIMITIVES  — raw palette values (--color-purple-*, --color-cream*).
+        b) SEMANTIC    — roles (--color-primary, --color-bg, --color-surface,
+           --color-text-muted, --radius-card, --shadow-card, ...).
+      Components consume SEMANTIC tokens only. To re-skin the app, change
+      values here — never override a component from a page stylesheet.
+   3. Ownership (one definition per component, no cross-file overrides):
+        base.css        app shell, .card, .badge, .toast, .sr-only, globals
+        auth.css        .btn*, .input/.field, .alert*, topbar identity, login
+        courses.css     .table*, .modal*, .state-box, .pager, .form-*, badges
+                        for course/video status
+        <page>.css      ONLY selectors unique to that page (prefixed by the
+                        page/feature name). Never redefine a shared class.
+      If a page needs a variant of a shared component, add a MODIFIER class
+      (e.g. .action-bar-footer) — do not redeclare the base class.
+   4. Existing token NAMES are a stable API (JS inline styles and ~12
+      stylesheets consume them). Change values freely; rename never.
    ========================================================================== */
 
 :root {
-  /* ---- Color: core palette (from the confirmed direction) ---- */
-  --color-violet-deep:   #4520a8;
-  --color-purple:        #7447e8;   /* primary accent */
-  --color-blue-electric: #4b8bff;
-  --color-pink-soft:     #f1a8d7;
-  --color-lavender-pale: #f0ecff;
-  --color-violet-dark:   #171329;   /* sparing use: dark accent text/surface */
+  /* =====================================================================
+     PRIMITIVES
+     ===================================================================== */
 
-  /* ---- Color: surfaces (light-dominant) ---- */
-  --color-bg: #fbfaff;                 /* app shell base, faint lavender-white */
-  --color-surface: #ffffff;            /* cards, inputs, sidebar, topbar */
-  --color-surface-alt: #f6f4fc;        /* subtle off-white section backgrounds */
-  --color-surface-sunken: #f0ecfa;     /* track backgrounds, chips, wells */
+  /* ---- Purple (brand) ---- */
+  --color-purple-50:  #faf7ff;   /* very light purple surface */
+  --color-purple-100: #f3e8ff;   /* light purple surface */
+  --color-purple-300: #c4b0ee;   /* borders / hover outlines on purple UI */
+  --color-purple-500: #6d28d9;   /* PRIMARY */
+  --color-purple-600: #5b21b6;   /* primary hover */
+  --color-purple-700: #4c1d95;   /* primary active */
+  --color-purple-900: #2e1065;   /* deep brand (sidebar) */
 
-  /* Glass surface: semi-transparent white for a light glass effect, used
-     tastefully (ambient shell, a few featured cards) — not everywhere. */
-  --color-glass-surface: rgba(255, 255, 255, 0.68);
-  --color-glass-border: rgba(255, 255, 255, 0.55);
+  /* ---- Cream (warm background) ---- */
+  --color-cream:        #fbf7ef;   /* main page background */
+  --color-cream-deep:   #f5efe3;   /* secondary cream surface */
+  --color-cream-border: #e8dfd0;   /* warm border on cream surfaces */
+
+  /* ---- Neutrals ---- */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-ink:           #211a2d;  /* primary text */
+  --color-ink-secondary: #625a6d;  /* secondary text (AA on white and cream) */
+  --color-ink-muted:     #8a8293;  /* decorative / placeholder only (not AA for body text) */
+  --color-line:          #e8e2ed;  /* default border */
+  --color-line-strong:   #d7cde3;  /* strong border */
+  --color-well:          #f1edf4;  /* neutral wells, chips, tracks (not purple, not cream) */
+  --color-track:         #e4deea;
+
+  /* =====================================================================
+     SEMANTIC COLOR
+     ===================================================================== */
+
+  /* ---- Brand / interactive ---- */
+  --color-primary:        var(--color-purple-500);
+  --color-primary-hover:  var(--color-purple-600);
+  --color-primary-active: var(--color-purple-700);
+  --color-primary-soft:   var(--color-purple-100);
+  --color-primary-softer: var(--color-purple-50);
+  --color-text-on-accent: var(--color-white);
+  --color-violet-dark:    var(--color-ink);      /* skip-link surface */
+
+  /* Legacy accent scale — kept because existing stylesheets consume it.
+     Maps onto the brand purple so there is one purple in the app. */
+  --color-accent-50:  var(--color-purple-50);
+  --color-accent-100: var(--color-purple-100);
+  --color-accent-300: var(--color-purple-300);
+  --color-accent-500: var(--color-purple-500);
+  --color-accent-600: var(--color-purple-600);
+  --color-accent-700: var(--color-purple-700);
+
+  /* ---- Surfaces ---- */
+  --color-bg:             var(--color-cream);       /* page background */
+  --color-surface:        var(--color-white);       /* cards, tables, inputs, modals */
+  --color-surface-alt:    var(--color-cream-deep);  /* warm secondary sections, panels */
+  --color-surface-sunken: var(--color-well);        /* wells, chips, neutral badges */
+
+  /* Glass surface (login card, .glass-card): semi-transparent white. */
+  --color-glass-surface: rgba(255, 255, 255, 0.78);
+  --color-glass-border:  rgba(255, 255, 255, 0.6);
   --glass-blur: blur(16px);
 
-  /* ---- Color: purple accent scale (primary) ---- */
-  --color-accent-50:  #f5f2fc;
-  --color-accent-100: #e9e2f9;
-  --color-accent-300: #b79cef;
-  --color-accent-500: #7447e8;    /* primary accent */
-  --color-accent-600: #6230d6;
-  --color-accent-700: #4520a8;
+  /* ---- Text ---- */
+  --color-text:        var(--color-ink);
+  --color-text-muted:  var(--color-ink-secondary);
+  --color-text-faint:  var(--color-ink-muted);
 
-  /* ---- Color: secondary accent scale (electric blue) ---- */
-  --color-blue-50:  #eef4ff;
-  --color-blue-100: #dce9ff;
-  --color-blue-300: #a6c5ff;
-  --color-blue-500: #4b8bff;
-  --color-blue-600: #2f6fe0;
-  --color-blue-700: #1d4fad;
+  /* ---- Borders ---- */
+  --color-border:        var(--color-line);
+  --color-border-strong: var(--color-line-strong);
+  --color-border-warm:   var(--color-cream-border);   /* borders on cream surfaces */
 
-  /* ---- Color: tertiary accent (soft pink — sparing, decorative use) ---- */
-  --color-pink-50:  #fdf1f8;
-  --color-pink-100: #fbe1f0;
-  --color-pink-300: #f1a8d7;
-  --color-pink-500: #e472b8;
-
-  /* ---- Color: text ---- */
-  --color-text: #211a35;
-  --color-text-muted: #77718a;
-  --color-text-faint: #a39cb1;
-  --color-text-on-accent: #ffffff;
-
-  /* ---- Color: borders / dividers ---- */
-  --color-border: #e7e3f3;
-  --color-border-strong: #d9d3ec;
-
-  /* ---- Color: semantic status (badges, alerts, inline messages) ---- */
+  /* ---- Semantic status (badges, alerts, toasts, validation) ----
+     Each state has bg / text / border so it can be used for a badge, an
+     alert or an inline message without inventing new colors. Purple is
+     never used for a status. */
   --color-success-bg: #e9f9ee;
   --color-success-text: #16794b;
   --color-success-border: #b7e4c7;
   --color-warning-bg: #fef3c7;
   --color-warning-text: #92400e;
-  --color-warning-bg-soft: #fef9c3;
-  --color-warning-text-soft: #854d0e;
+  --color-warning-border: #f3d98b;
   --color-error-bg: #fdeceb;
   --color-error-text: #b91c1c;
   --color-error-text-strong: #991b1b;
   --color-error-border: #fecaca;
-  --color-info-bg: #e0f0ff;
+  --color-info-bg: #e5f1ff;
   --color-info-text: #1d5fa4;
-  --color-info-bg-soft: #fff8e0;
-  --color-info-text-soft: #9a6700;
+  --color-info-border: #b9d7f5;
 
-  /* ---- Pure values used sparingly outside the palette (overlays, video
-     frames) — tokenized so no hex lives outside this file. ---- */
-  --color-white: #ffffff;
-  --color-black: #000000;
-  --color-track: #e4e0ee;
-
-  /* Overlay alphas on black/white — media viewers, modal close buttons. */
+  /* ---- Overlays (media viewers, modal backdrop, spinners) ---- */
   --overlay-dark-strong: rgba(0, 0, 0, 0.75);
   --overlay-dark-mid: rgba(0, 0, 0, 0.5);
   --overlay-light-mid: rgba(255, 255, 255, 0.4);
   --overlay-light-soft: rgba(255, 255, 255, 0.78);
-  --overlay-violet-mid: rgba(23, 19, 41, 0.5);
+  --overlay-violet-mid: rgba(33, 26, 45, 0.5);
+  --overlay-light-faint: rgba(255, 255, 255, 0.1);   /* decorative rings on dark purple panels */
 
-  /* ---- Gradients: explicit reusable tokens ---- */
-  /* Primary CTA gradient — buttons, selected nav items, progress fills. */
-  --gradient-primary: linear-gradient(135deg, var(--color-purple) 0%, var(--color-blue-600) 100%); /* blue-600: keeps white text >= 4.5:1 */
-  --gradient-primary-hover: linear-gradient(135deg, var(--color-violet-deep) 0%, var(--color-blue-700) 100%);
-  /* Featured-card gradient — a few highlighted dashboard stat cards. */
-  --gradient-feature: linear-gradient(135deg, var(--color-violet-deep) 0%, var(--color-purple) 55%, var(--color-pink-soft) 100%);
-  /* Sidebar active-item gradient. */
-  --gradient-nav-active: linear-gradient(135deg, var(--color-purple) 0%, var(--color-violet-deep) 100%);
-  /* Ambient background glows (decorative, non-interactive, low opacity). */
-  --gradient-ambient-1: radial-gradient(circle, var(--color-purple) 0%, transparent 70%);
-  --gradient-ambient-2: radial-gradient(circle, var(--color-blue-electric) 0%, transparent 70%);
-  --gradient-ambient-3: radial-gradient(circle, var(--color-pink-soft) 0%, transparent 70%);
-  /* Text gradient — sparing use on a hero figure / brand mark. */
-  --gradient-text: linear-gradient(135deg, var(--color-violet-deep), var(--color-purple));
+  /* ---- Gradients: SPARING. Same-hue only (purple -> deeper purple). ----
+     Consumers use `background: var(--gradient-*)` and, in analytics,
+     `border-image`, so these stay valid <gradient> values. */
+  --gradient-primary: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-purple-600) 100%);
+  --gradient-primary-hover: linear-gradient(135deg, var(--color-purple-600) 0%, var(--color-purple-700) 100%);
+  --gradient-feature: linear-gradient(135deg, var(--color-purple-700) 0%, var(--color-purple-500) 100%);
+  /* Ambient background glows (decorative, non-interactive, very low opacity). */
+  --gradient-ambient-1: radial-gradient(circle, var(--color-purple-500) 0%, transparent 70%);
+  --gradient-ambient-2: radial-gradient(circle, var(--color-purple-300) 0%, transparent 70%);
+  --gradient-ambient-3: radial-gradient(circle, var(--color-cream-border) 0%, transparent 70%);
 
-  /* ---- Shadows ---- */
-  --shadow-sm: 0 1px 2px rgba(23, 19, 41, 0.05);
-  --shadow-md: 0 4px 16px rgba(23, 19, 41, 0.08);
-  --shadow-lg: 0 12px 32px rgba(23, 19, 41, 0.12);
-  --shadow-xl: 0 24px 56px rgba(23, 19, 41, 0.16);
-  /* Accent "glow" shadow — primary buttons, active nav, featured cards. */
-  --shadow-glow: 0 8px 24px rgba(116, 71, 232, 0.28);
-  --shadow-glow-sm: 0 4px 12px rgba(116, 71, 232, 0.22);
+  /* =====================================================================
+     ELEVATION — restrained. Rely on borders first, shadow second.
+     ===================================================================== */
+  --shadow-sm: 0 1px 2px rgba(33, 26, 45, 0.05);
+  --shadow-md: 0 4px 12px rgba(33, 26, 45, 0.07);
+  --shadow-lg: 0 10px 24px rgba(33, 26, 45, 0.10);
+  --shadow-xl: 0 20px 44px rgba(33, 26, 45, 0.14);
+  /* Primary-action shadow: low, tinted, never a halo. */
+  --shadow-glow: 0 4px 12px rgba(109, 40, 217, 0.22);
+  --shadow-glow-sm: 0 1px 2px rgba(109, 40, 217, 0.25);
 
-  /* ---- Focus ring ---- */
-  --focus-ring: 0 0 0 3px var(--color-accent-100);
-  --focus-ring-color: var(--color-accent-500);
+  /* Semantic elevation roles — components use THESE. */
+  --shadow-card: var(--shadow-sm);
+  --shadow-elevated: var(--shadow-md);
+  --shadow-dropdown: var(--shadow-lg);
+  --shadow-modal: var(--shadow-xl);
 
-  /* ---- Spacing scale (4px base) ---- */
+  /* ---- Focus ---- */
+  --color-focus-halo: rgba(109, 40, 217, 0.22);
+  --focus-ring: 0 0 0 3px var(--color-focus-halo);
+  --focus-ring-color: var(--color-primary);
+
+  /* =====================================================================
+     SPACING (4px base)
+     ===================================================================== */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
+  --space-5: 1.25rem;
   --space-6: 1.5rem;
   --space-8: 2rem;
+  --space-10: 2.5rem;
   --space-12: 3rem;
   --space-16: 4rem;
   --space-24: 6rem;
 
-  /* ---- Radius ---- */
+  /* Semantic spacing roles (aliases onto the scale above). */
+  --space-compact: var(--space-1);   /* icon/label gaps, dense cells */
+  --space-small:   var(--space-2);
+  --space-default: var(--space-4);
+  --space-medium:  var(--space-6);
+  --space-large:   var(--space-8);
+  --space-section: var(--space-12);  /* between major page sections */
+  --space-page:    var(--space-8);   /* main content padding (desktop) */
+
+  /* =====================================================================
+     RADIUS — professional, not playful
+     ===================================================================== */
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-full: 999px;
 
-  /* ---- Typography ----
-     Plus Jakarta Sans for headings/brand/nav/buttons (distinctive, geometric,
-     attractive display feel); Inter stays the workhorse body/table/form font
-     for maximum readability at small sizes. Both loaded in <head>. */
-  --font-family-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --radius-control: var(--radius-sm);    /* checkboxes, small chips, icon buttons */
+  --radius-field:   var(--radius-md);    /* buttons, inputs, selects */
+  --radius-card:    var(--radius-lg);    /* cards */
+  --radius-panel:   var(--radius-xl);    /* modals, large panels */
+  --radius-pill:    var(--radius-full);  /* badges, tags */
+
+  /* =====================================================================
+     TYPOGRAPHY
+     Poppins for the whole app (headings, body, forms, tables), loaded from
+     Google Fonts in each page <head>; system fallbacks below. Both tokens are
+     kept so a display/body split can return without touching components.
+     ===================================================================== */
+  --font-family-display: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-base: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
@@ -153,25 +214,50 @@
   --font-size-2xl: 2rem;
   --font-size-3xl: 2.75rem;
 
-  /* ---- Sidebar (dedicated dark-on-gradient surface, see reference UI) ---- */
-  --sidebar-bg: linear-gradient(180deg, #2a1868 0%, #1c1148 55%, #150d38 100%);
-  --sidebar-text: rgba(255, 255, 255, 0.72);
-  --sidebar-text-strong: #ffffff;
-  --sidebar-text-faint: rgba(255, 255, 255, 0.45);
-  --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
-  --sidebar-active-bg: rgba(255, 255, 255, 0.14);
-  --sidebar-border: rgba(255, 255, 255, 0.1);
+  /* Role tokens */
+  --font-size-helper:        0.8125rem;                  /* hints, validation, sub-text */
+  --font-size-label:         var(--font-size-sm);        /* form labels, table cells */
+  --font-size-body:          var(--font-size-base);
+  --font-size-card-title:    var(--font-size-lg);        /* h3 */
+  --font-size-section-title: 1.25rem;                    /* h2 */
+  --font-size-page-title:    1.75rem;                    /* h1 */
+  --font-size-stat:          1.75rem;                    /* large dashboard figures */
 
-  /* ---- Motion ---- */
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+  --line-height-relaxed: 1.65;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* ---- Sidebar / drawer (Phase 2 navigation) ---- */
+  --sidebar-bg: linear-gradient(180deg, var(--color-purple-700) 0%, var(--color-purple-900) 100%);
+  --sidebar-text: rgba(255, 255, 255, 0.76);
+  --sidebar-text-strong: #ffffff;
+  --sidebar-text-faint: rgba(255, 255, 255, 0.5);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  --sidebar-active-bg: rgba(255, 255, 255, 0.16);
+  --sidebar-border: rgba(255, 255, 255, 0.12);
+
+  /* ---- Motion: subtle; every consumer also honors prefers-reduced-motion ---- */
   --duration-fast: 0.15s;
   --duration-base: 0.25s;
   --duration-slow: 0.5s;
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --transition-fast: var(--duration-fast) var(--ease-standard);
+  --transition-base: var(--duration-base) var(--ease-standard);
 
   /* ---- Layout ---- */
   --max-width: 1200px;
   --sidebar-width: 264px;
+  /* Mobile/tablet drawer width (Phase 2): wide enough for the longest nav
+     label without wrapping, capped so it never exceeds a 320px viewport
+     (320 * 0.86 ≈ 275px) while still showing a strip of the page behind it. */
+  --drawer-width: min(85vw, 300px);
 
   /* ---- Breakpoints (reference values — see note below) ----
      Single source of truth for the app's 3-tier responsive system:
