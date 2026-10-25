@@ -75,11 +75,17 @@ progress {
   color: var(--color-text-muted);
 }
 
-/* ---- App shell: fixed sidebar + main content, with ambient background ---- */
+/* ---- App shell: main content + an off-canvas drawer, with ambient background ----
+   The sidebar is a drawer at every width now, not just on tablet/mobile:
+   it never reserves its own grid column, so .main-content always has the
+   full shell width to itself and only ever shows the sidebar as a
+   slide-in overlay opened via the hamburger (.menu-toggle). See the
+   RESPONSIVE ARCHITECTURE block below for the drawer's own positioning
+   (shared at every breakpoint, not just ≤1024px). */
 .app-shell {
   position: relative;
   display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-columns: 1fr;
   min-height: 100vh;
   isolation: isolate; /* keeps ambient glows from bleeding over focus rings etc. */
   overflow-x: clip;
@@ -157,13 +163,12 @@ progress {
 
 /* ---- Sidebar ----
    Solid deep-indigo gradient panel (matches reference), white/translucent
-   text, icon + label nav rows, pill-shaped active/hover states. */
+   text, icon + label nav rows, pill-shaped active/hover states. Visual
+   styling only here — positioning (fixed, off-canvas, slide transform) is
+   set once, unconditionally, in the drawer rule further down, since the
+   sidebar is a drawer at every width now rather than a permanent desktop
+   column. */
 .sidebar {
-  position: sticky;
-  top: 0;
-  align-self: start;        /* don't stretch to grid row height, or sticky has nothing to stick within */
-  height: 100vh;            /* fallback */
-  height: 100dvh;
   overflow-y: auto;         /* sidebar scrolls on its own if the menu is taller than the screen */
   overscroll-behavior: contain;
   /* Slim, translucent scrollbar that blends into the purple panel (the
@@ -440,13 +445,15 @@ progress {
   min-width: 0;
 }
 
-/* ---- Hamburger / menu toggle (Phase 2) ----
-   Mobile + tablet only (shown below 1025px, see breakpoint block). Hidden
-   on desktop where the sidebar is permanently visible. Uses the same
-   button sizing language as .btn-outline/.btn-sm elsewhere in the app but
-   is its own class since it's icon-only and always square. */
+/* ---- Hamburger / menu toggle ----
+   Shown at every width: the sidebar is always a drawer now (see
+   .app-shell / .sidebar above and the RESPONSIVE ARCHITECTURE block
+   below), so the hamburger that opens it is never hidden on desktop
+   either. Uses the same button sizing language as .btn-outline/.btn-sm
+   elsewhere in the app but is its own class since it's icon-only and
+   always square. */
 .menu-toggle {
-  display: none;               /* desktop default: no drawer, no button */
+  display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
@@ -626,59 +633,49 @@ progress {
    in lockstep instead of each page breaking at a different width.
    ========================================================================== */
 
-/* ---- Tablet (≤1024px): the persistent sidebar is replaced by a left-side
-   slide-in drawer, since 264px of fixed sidebar meaningfully crowds a
-   portrait tablet or small laptop window before 768px ever hits. ---- */
-@media (max-width: 1024px) {
-  .app-shell {
-    grid-template-columns: 1fr;
-  }
+/* ---- Drawer sidebar: on every width, not just tablet/mobile ----
+   The sidebar is always an off-canvas drawer now — closed by default,
+   opened only via the hamburger (.menu-toggle) — so .main-content always
+   gets the shell's full width instead of a permanent 264px column being
+   reserved for it on desktop. Fixed + transform (not display/width) so
+   the slide transition is a single compositor-friendly property and
+   never triggers layout. */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 1300;
+  width: var(--drawer-width);
+  height: 100vh;
+  height: 100dvh;
+  max-width: 100vw;
+  transform: translateX(-100%);
+  transition: transform var(--duration-base) var(--ease-standard);
+  border-right: 1px solid var(--sidebar-border);
+  box-shadow: var(--shadow-xl);
+  /* Closed by default: not just visually hidden off-canvas, but also
+     out of tab order and out of the accessibility tree, so focus and
+     screen-reader users never land on an off-screen drawer. */
+  visibility: hidden;
+  padding-top: calc(var(--space-6) + env(safe-area-inset-top, 0px));
+  padding-left: calc(var(--space-4) + env(safe-area-inset-left, 0px));
+  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+}
 
+.sidebar.is-open {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+}
+
+/* ---- Tablet (≤1024px) ---- */
+@media (max-width: 1024px) {
   .main-content {
     min-width: 0;
-  }
-
-  /* The hamburger button only exists where the drawer does. */
-  .menu-toggle {
-    display: inline-flex;
-  }
-
-  /* ---- Drawer ----
-     Same element as the desktop sidebar (.sidebar) so there is exactly one
-     nav markup and one set of nav-link/active/hover/icon styles for every
-     breakpoint — only its positioning and visibility change here. Fixed
-     + transform (not display/width) so the slide transition is a single
-     compositor-friendly property and never triggers layout. */
-  .sidebar {
-    position: fixed;
-    inset: 0 auto 0 0;
-    z-index: 1300;
-    width: var(--drawer-width);
-    height: 100vh;
-    height: 100dvh;
-    max-width: 100vw;
-    transform: translateX(-100%);
-    transition: transform var(--duration-base) var(--ease-standard);
-    border-right: 1px solid var(--sidebar-border);
-    box-shadow: var(--shadow-xl);
-    /* Closed by default: not just visually hidden off-canvas, but also
-       out of tab order and out of the accessibility tree, so focus and
-       screen-reader users never land on an off-screen drawer. */
-    visibility: hidden;
-    padding-top: calc(var(--space-6) + env(safe-area-inset-top, 0px));
-    padding-left: calc(var(--space-4) + env(safe-area-inset-left, 0px));
-    padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
-  }
-
-  .sidebar.is-open {
-    transform: translateX(0);
-    visibility: visible;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .sidebar {
-      transition: none;
-    }
   }
 
   /* Vertically stacked nav inside the drawer (same as desktop — this just

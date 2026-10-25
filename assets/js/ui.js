@@ -376,9 +376,11 @@ const ResponsiveNav = (() => {
       link.addEventListener('click', () => close({ restoreFocus: false }));
     });
 
-    // Crossing into desktop width must never leave the drawer "open" in a
-    // state that fights the now-permanent sidebar; crossing back down must
-    // start closed, not resume whatever it was mid-resize.
+    // The drawer is closed by default at every width; this just makes sure
+    // resizing the window never leaves it stuck open from a narrower size
+    // it was opened at — it does not force any particular state, since
+    // "closed unless the hamburger opened it" is now true at every width,
+    // not only below the old desktop breakpoint.
     const mq = window.matchMedia(DESKTOP_QUERY);
     const onViewportChange = (e) => {
       if (e.matches) close({ restoreFocus: false });
