@@ -180,7 +180,7 @@
   --space-medium:  var(--space-6);
   --space-large:   var(--space-8);
   --space-section: var(--space-12);  /* between major page sections */
-  --space-page:    var(--space-8);   /* main content padding (desktop) */
+  --space-page:    var(--space-6);   /* main content padding (desktop) — was --space-8, tightened so wide screens don't read as half-empty now the sidebar sits in its own rail column */
 
   /* =====================================================================
      RADIUS — professional, not playful
@@ -252,8 +252,15 @@
   --transition-base: var(--duration-base) var(--ease-standard);
 
   /* ---- Layout ---- */
-  --max-width: 1200px;
+  --max-width: 1440px;
   --sidebar-width: 264px;
+  /* Desktop (≥1025px) permanent rail: icon-only, no labels, so it reserves
+     much less width than the old full-label sidebar (--sidebar-width,
+     kept above for reference/tablet-drawer math) while still always being
+     visible — no hamburger needed at this tier. Sized for the 1.125rem
+     icon plus its row padding (--space-3 each side) and a little breathing
+     room, not an arbitrary round number. */
+  --sidebar-rail-width: 4.5rem;
   /* Mobile/tablet drawer width (Phase 2): wide enough for the longest nav
      label without wrapping, capped so it never exceeds a 320px viewport
      (320 * 0.86 ≈ 275px) while still showing a strip of the page behind it. */

@@ -269,11 +269,12 @@ const Ui = (() => {
  *   <aside class="sidebar" id="sidebar-nav"> ... (unchanged) ... </aside>
  *   <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
  *
- * Desktop (>1024px) never opens the drawer — .sidebar is the permanent
- * column there regardless of this module's state, and the toggle button is
- * hidden by base.css, so this code simply has nothing to do above that
- * width other than guarantee the drawer isn't left open from a narrower
- * viewport (handled by the resize listener below).
+ * Desktop (>1024px): .sidebar is a permanent icon-only rail there (its own
+ * .app-shell grid column, not a drawer) and .menu-toggle is hidden by
+ * base.css, so this module has nothing to open/close above that width —
+ * it only guarantees the drawer isn't left open from a narrower viewport
+ * if the window is resized past 1024px while it was open (resize listener
+ * below).
  *
  * Safe to call more than once: init() is idempotent and only ever attaches
  * its listeners a single time per page load (early-return via a module-level
@@ -397,6 +398,33 @@ if (document.readyState === 'loading') {
 } else {
   ResponsiveNav.init();
 }
+
+/**
+ * Sidebar rail tooltips (Phase 3 — desktop icon-only rail): the ≥1025px
+ * rail collapses every nav label's text to zero width (base.css), so the
+ * icon alone carries no indication of what it links to. Rather than
+ * hand-writing the same label twice (once in the link's own text, once
+ * in a title=""), this copies each link's EXISTING text into its title
+ * attribute once at load, giving the native browser tooltip on hover/
+ * focus with a single source of truth for the label. Harmless at
+ * ≤1024px too — the drawer shows the label directly, so the title
+ * attribute simply never gets a chance to show there.
+ */
+(function initSidebarRailTooltips() {
+  function init() {
+    document.querySelectorAll('.sidebar nav a, .sidebar nav .nav-disabled').forEach((link) => {
+      if (link.hasAttribute('title')) return; // page already set a custom one — don't clobber it
+      const label = link.textContent.trim();
+      if (label) link.setAttribute('title', label);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 
 /**
  * Scrollable-table edge fade (Phase 9): every `.table-wrap` on a listing

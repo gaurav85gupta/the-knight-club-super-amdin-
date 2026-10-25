@@ -75,17 +75,19 @@ progress {
   color: var(--color-text-muted);
 }
 
-/* ---- App shell: main content + an off-canvas drawer, with ambient background ----
-   The sidebar is a drawer at every width now, not just on tablet/mobile:
-   it never reserves its own grid column, so .main-content always has the
-   full shell width to itself and only ever shows the sidebar as a
-   slide-in overlay opened via the hamburger (.menu-toggle). See the
-   RESPONSIVE ARCHITECTURE block below for the drawer's own positioning
-   (shared at every breakpoint, not just ≤1024px). */
+/* ---- App shell: main content + sidebar, with ambient background ----
+   Desktop (≥1025px): the sidebar is a permanent icon-only rail that
+   reserves its own grid column (see --sidebar-rail-width in tokens.css),
+   so .main-content sits beside it rather than centering alone with the
+   sidebar hidden behind a hamburger. No overlay, no hamburger at this
+   tier — see the RESPONSIVE ARCHITECTURE block for the ≤1024px drawer
+   behavior, which is unchanged (off-canvas, opened via .menu-toggle).
+   The grid-template-columns value here is the desktop default; the
+   ≤1024px tier in RESPONSIVE ARCHITECTURE overrides it back to 1fr. */
 .app-shell {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: var(--sidebar-rail-width) 1fr;
   min-height: 100vh;
   isolation: isolate; /* keeps ambient glows from bleeding over focus rings etc. */
   overflow-x: clip;
@@ -164,10 +166,13 @@ progress {
 /* ---- Sidebar ----
    Solid deep-indigo gradient panel (matches reference), white/translucent
    text, icon + label nav rows, pill-shaped active/hover states. Visual
-   styling only here — positioning (fixed, off-canvas, slide transform) is
-   set once, unconditionally, in the drawer rule further down, since the
-   sidebar is a drawer at every width now rather than a permanent desktop
-   column. */
+   styling only here — positioning differs by tier: desktop (≥1025px) is
+   a permanent icon-only rail occupying the .app-shell grid column set
+   above; ≤1024px it's the off-canvas drawer set in the RESPONSIVE
+   ARCHITECTURE block further down (fixed, slide-in, full label width).
+   Label text (nav link words + the "Knight Club" brand wordmark) is
+   collapsed to 0 width only at the desktop rail tier — see the
+   ≥1025px rail block below — so the same markup serves both. */
 .sidebar {
   overflow-y: auto;         /* sidebar scrolls on its own if the menu is taller than the screen */
   overscroll-behavior: contain;
@@ -179,36 +184,44 @@ progress {
   display: flex;
   flex-direction: column;
   background: var(--sidebar-bg);
-  border-right: none;
-  padding: var(--space-6) var(--space-4);
+  border-right: 1px solid var(--sidebar-border);
+  /* Desktop rail default: tight horizontal padding sized for the icon
+     column, not the old full-label sidebar's --space-4. Overridden back
+     to the wider drawer padding at ≤1024px (RESPONSIVE ARCHITECTURE). */
+  padding: var(--space-6) var(--space-2);
 }
 
 .sidebar .brand {
-  /* One-line wordmark: the logo image + "The Knight Club" in a single font,
-     size and weight (the bare "The" text node and the <span> now match). */
+  /* Desktop rail: logo only, centered, wordmark text collapsed (see the
+     font-size: 0 trick below — identical technique to the nav links, so
+     there's exactly one collapse mechanism to reason about). ≤1024px
+     overrides this back to the one-line "The Knight Club" wordmark. */
   display: flex;
   align-items: center;
+  justify-content: center;
   column-gap: 0;
   font-family: var(--font-family-display);
   font-weight: 700;
-  font-size: 1.125rem;
+  font-size: 0;
   line-height: 1.1;
   letter-spacing: -0.01em;
   margin-bottom: var(--space-5);
-  padding: 0 var(--space-2) var(--space-5);
+  padding: 0 0 var(--space-5);
   border-bottom: 1px solid var(--sidebar-border);
   white-space: nowrap;
   color: var(--sidebar-text-strong);
 }
 
 /* Logo: the Knight Club emblem (assets/images/logo.png, transparent PNG).
-   Path is relative to this stylesheet (assets/css/ -> assets/images/). */
+   Path is relative to this stylesheet (assets/css/ -> assets/images/).
+   Sized down slightly from the old full-sidebar logo so it sits
+   comfortably centered in the narrower rail. */
 .sidebar .brand::before {
   content: "";
   flex-shrink: 0;
-  width: 2.75rem;
-  height: 2.5rem;
-  margin-right: var(--space-3);
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-right: 0;
   background: url("../images/logo.png") center / contain no-repeat;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
 }
@@ -235,20 +248,34 @@ progress {
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: center; /* rail default: icon centered in the narrow column */
   gap: var(--space-3);
-  padding: 0.5625rem var(--space-3);
+  padding: 0.5625rem 0;
   border-radius: var(--radius-md);
   color: var(--sidebar-text);
   font-weight: 500;
-  font-size: var(--font-size-sm);
+  font-size: 0;            /* collapses the bare text node; icon size is in rem so it's unaffected (see ::before below) */
+  white-space: nowrap;
   margin-bottom: 2px;
   transition: background var(--duration-fast) var(--ease-standard),
               color var(--duration-fast) var(--ease-standard),
               transform var(--duration-fast) var(--ease-standard);
 }
 
+/* The label text itself is never shown in the rail — each link's own
+   title="" attribute (set once at runtime by ui.js from the link's
+   existing text, no HTML/content duplication) gives the native browser
+   tooltip on hover/focus instead, rather than re-expanding the link's
+   own box (which would need the rail's overflow-x to compute to
+   visible — impossible here, since overflow-y: auto, needed so a tall
+   nav list can scroll, forces overflow-x to auto too per the CSS
+   overflow spec). */
+
 /* Icon slot before every nav label — filled per-item below via
-   background-image data URIs so no HTML edits are needed on any page. */
+   background-image data URIs so no HTML edits are needed on any page.
+   Sized in rem (not em), so it stays the same size whether the link's
+   own font-size is 0 (rail, collapsed) or --font-size-sm (hover/focus,
+   expanded, or the ≤1024px drawer where labels are always shown). */
 .sidebar nav a::before,
 .sidebar nav .nav-disabled::before {
   content: "";
@@ -446,14 +473,16 @@ progress {
 }
 
 /* ---- Hamburger / menu toggle ----
-   Shown at every width: the sidebar is always a drawer now (see
-   .app-shell / .sidebar above and the RESPONSIVE ARCHITECTURE block
-   below), so the hamburger that opens it is never hidden on desktop
-   either. Uses the same button sizing language as .btn-outline/.btn-sm
+   Desktop (≥1025px) hides this: the sidebar is a permanent icon-only
+   rail there (see .app-shell / .sidebar above), so there's no drawer
+   to open and the button would be dead weight in the topbar. It's
+   shown again at ≤1024px, where the sidebar is still the off-canvas
+   drawer (RESPONSIVE ARCHITECTURE block below) and needs a way to
+   open. Uses the same button sizing language as .btn-outline/.btn-sm
    elsewhere in the app but is its own class since it's icon-only and
    always square. */
 .menu-toggle {
-  display: inline-flex;
+  display: none;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
@@ -466,6 +495,12 @@ progress {
   color: var(--color-text);
   cursor: pointer;
   transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+@media (max-width: 1024px) {
+  .menu-toggle {
+    display: inline-flex;
+  }
 }
 
 .menu-toggle:hover {
@@ -633,37 +668,67 @@ progress {
    in lockstep instead of each page breaking at a different width.
    ========================================================================== */
 
-/* ---- Drawer sidebar: on every width, not just tablet/mobile ----
-   The sidebar is always an off-canvas drawer now — closed by default,
-   opened only via the hamburger (.menu-toggle) — so .main-content always
-   gets the shell's full width instead of a permanent 264px column being
-   reserved for it on desktop. Fixed + transform (not display/width) so
-   the slide transition is a single compositor-friendly property and
-   never triggers layout. */
-.sidebar {
-  position: fixed;
-  inset: 0 auto 0 0;
-  z-index: 1300;
-  width: var(--drawer-width);
-  height: 100vh;
-  height: 100dvh;
-  max-width: 100vw;
-  transform: translateX(-100%);
-  transition: transform var(--duration-base) var(--ease-standard);
-  border-right: 1px solid var(--sidebar-border);
-  box-shadow: var(--shadow-xl);
-  /* Closed by default: not just visually hidden off-canvas, but also
-     out of tab order and out of the accessibility tree, so focus and
-     screen-reader users never land on an off-screen drawer. */
-  visibility: hidden;
-  padding-top: calc(var(--space-6) + env(safe-area-inset-top, 0px));
-  padding-left: calc(var(--space-4) + env(safe-area-inset-left, 0px));
-  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
-}
+/* ---- Tablet/mobile (≤1024px): off-canvas drawer ----
+   Below the desktop tier, the sidebar reverts to the original Phase-2
+   drawer — closed by default, opened via the hamburger (.menu-toggle),
+   full label width — since a permanent rail (even icon-only) doesn't
+   leave enough room for real page content at these widths. Fixed +
+   transform (not display/width) so the slide transition is a single
+   compositor-friendly property and never triggers layout. */
+@media (max-width: 1024px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
 
-.sidebar.is-open {
-  transform: translateX(0);
-  visibility: visible;
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1300;
+    width: var(--drawer-width);
+    height: 100vh;
+    height: 100dvh;
+    max-width: 100vw;
+    transform: translateX(-100%);
+    transition: transform var(--duration-base) var(--ease-standard);
+    border-right: 1px solid var(--sidebar-border);
+    box-shadow: var(--shadow-xl);
+    /* Closed by default: not just visually hidden off-canvas, but also
+       out of tab order and out of the accessibility tree, so focus and
+       screen-reader users never land on an off-screen drawer. */
+    visibility: hidden;
+    padding-top: calc(var(--space-6) + env(safe-area-inset-top, 0px));
+    padding-left: calc(var(--space-4) + env(safe-area-inset-left, 0px));
+    padding-right: var(--space-4);
+    padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .sidebar.is-open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  /* Drawer tier always shows full labels — the desktop rail collapses
+     .sidebar .brand and .sidebar nav a to font-size: 0 unconditionally
+     (see those rules above), so this restores the actual readable
+     sizes rather than `inherit` (whose inherited value could itself
+     resolve to 0 through that same chain). Also restores the icon's
+     left-aligned row layout, since the rail centers icons by default. */
+  .sidebar .brand {
+    justify-content: flex-start;
+    font-size: 1.125rem;
+    padding: 0 var(--space-2) var(--space-5);
+  }
+  .sidebar .brand::before {
+    width: 2.75rem;
+    height: 2.5rem;
+    margin-right: var(--space-3);
+  }
+  .sidebar nav a,
+  .sidebar nav .nav-disabled {
+    justify-content: flex-start;
+    font-size: var(--font-size-sm);
+    padding: 0.5625rem var(--space-3);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
