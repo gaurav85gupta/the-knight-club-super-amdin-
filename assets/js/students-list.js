@@ -77,12 +77,12 @@
     for (const s of items) {
       els.body.appendChild(Dom.el('tr', {}, [
         Dom.el('td', {}, [formatStudent(s)]),
-        Dom.el('td', {}, [Dom.el('span', { class: 'order-id', text: s.userId })]),
-        Dom.el('td', { text: s.mobile || '—' }),
+        Dom.el('td', { 'data-col': 'tertiary' }, [Dom.el('span', { class: 'order-id', text: s.userId })]),
+        Dom.el('td', { 'data-col': 'secondary', text: s.mobile || '—' }),
         Dom.el('td', {}, [Ui.statusBadge(s.status)]),
-        Dom.el('td', { text: String(s.enrollmentCount) }),
-        Dom.el('td', { text: String(s.purchaseCount) }),
-        Dom.el('td', { text: Dom.formatDate(s.createdAt) }),
+        Dom.el('td', { 'data-col': 'secondary', text: String(s.enrollmentCount) }),
+        Dom.el('td', { 'data-col': 'secondary', text: String(s.purchaseCount) }),
+        Dom.el('td', { 'data-col': 'secondary', text: Dom.formatDate(s.createdAt) }),
         Dom.el('td', {}, [
           Dom.el('a', { class: 'btn btn-outline btn-sm', href: `student-details.html?id=${encodeURIComponent(s.id)}`, text: 'View' }),
         ]),

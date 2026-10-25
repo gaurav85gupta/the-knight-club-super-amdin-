@@ -17,10 +17,57 @@
    table keeps its real column layout and scrolls sideways within its own
    card, instead of each row being reflowed into a stacked key/value block.
    This keeps 6-10 column tables (courses, orders, leads) scannable and
-   avoids a different, bespoke mobile layout per table. */
+   avoids a different, bespoke mobile layout per table.
+
+   The scroll only reads as usable if it's visibly a scroll area: a bare
+   `overflow-x: auto` relies on the OS's own scrollbar, which on touch
+   laptops/tablets stays invisible until actively dragged, so the table
+   just looked cut off. A permanently visible, styled scrollbar + a fading
+   edge on the side with more content fixes that without changing the
+   underlying scroll pattern. */
 .table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch; /* momentum scroll on iOS */
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+  /* Without this, the scrollbar track sits flush against the pager right
+     below it with zero breathing room, so even a styled, always-visible
+     scrollbar read as a stray 1px line rather than a control — this is
+     what made the table look "stuck", not actually scrollable. */
+  padding-bottom: 6px;
+}
+.table-wrap::-webkit-scrollbar {
+  height: 8px;
+}
+.table-wrap::-webkit-scrollbar-track {
+  background: var(--color-surface-alt);
+}
+.table-wrap::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+.table-wrap::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Fade shadow on whichever edge still hides columns; classes are kept in
+   sync with real scroll position by ui.js (initTableScrollHints). An inset
+   box-shadow on the scroll container itself (rather than a ::before/::after
+   pseudo-element) because .table-wrap's only "real" box is the one that
+   actually clips the content — a pseudo-element sitting in the same flow
+   as the (much wider) table inside it has no reliable way to size itself
+   to the container instead of the content, whereas an inset shadow is
+   painted directly on that clipping box and needs no sizing at all. */
+.table-wrap.can-scroll-right {
+  box-shadow: inset -24px 0 16px -16px rgba(0, 0, 0, 0.18);
+}
+.table-wrap.can-scroll-left {
+  box-shadow: inset 24px 0 16px -16px rgba(0, 0, 0, 0.18);
+}
+.table-wrap.can-scroll-left.can-scroll-right {
+  box-shadow: inset 24px 0 16px -16px rgba(0, 0, 0, 0.18),
+              inset -24px 0 16px -16px rgba(0, 0, 0, 0.18);
 }
 .table { width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); }
 .table th {
@@ -520,16 +567,22 @@ textarea.input { max-width: 100%; }
 .listing-page .filters .btn { flex: 0 0 auto; margin-left: auto; height: 2.5rem; }
 .listing-page .filters > span:empty { display: none; }
 
-/* ---- Table: edge-to-edge inside the card ---- */
+/* ---- Table: edge-to-edge inside the card ----
+   Horizontal cell padding is deliberately tighter than the space-4/space-5
+   a non-table layout would use: with up to 9 columns (courses) in play,
+   every extra pixel of padding is a pixel multiplied by 9, and that
+   padding alone (not any single column's content) was what pushed even
+   the full, nothing-hidden desktop table wider than its card — the data
+   itself fits, the breathing room around it didn't. */
 .listing-page .table-wrap { border-top: 1px solid var(--color-border); }
 .listing-page .table th,
-.listing-page .table td { padding: var(--space-3) var(--space-4); }
+.listing-page .table td { padding: var(--space-3) var(--space-2); }
 .listing-page .table th:first-child,
-.listing-page .table td:first-child { padding-left: var(--space-5); }
+.listing-page .table td:first-child { padding-left: var(--space-4); }
 .listing-page .table th:last-child,
-.listing-page .table td:last-child { padding-right: var(--space-5); }
+.listing-page .table td:last-child { padding-right: var(--space-4); }
 .listing-page .table th { font-size: var(--font-size-xs); }
-.listing-page .table td { overflow-wrap: break-word; }
+.listing-page .table td { overflow-wrap: break-word; font-size: var(--font-size-xs); }
 
 /* Short, scannable values (dates, prices, badges, ids) stay on one line so
    rows keep a steady height; the table-wrap scrolls sideways when needed.
@@ -551,10 +604,10 @@ textarea.input { max-width: 100%; }
 .listing-page .table tbody tr:hover { background: var(--color-primary-softer); }
 
 /* ---- Row actions: one compact, consistent style ---- */
-.listing-page .table-actions { flex-wrap: nowrap; align-items: center; gap: var(--space-2); }
+.listing-page .table-actions { flex-wrap: nowrap; align-items: center; gap: var(--space-1); }
 .listing-page .table .btn-sm,
 .listing-page .table .btn-xs {
-  padding: 0.35rem 0.75rem;
+  padding: 0.35rem 0.6rem;
   font-size: var(--font-size-helper);
   white-space: nowrap;
 }
@@ -605,6 +658,23 @@ textarea.input { max-width: 100%; }
 .listing-page .pager-buttons .btn { padding: 0.35rem 0.9rem; }
 .listing-page #pager-page { font-weight: var(--font-weight-semibold); color: var(--color-text); font-variant-numeric: tabular-nums; }
 
+/* ---- Tablet (≤1024px) ----
+   The primary "+ Add / + New" action used to just sit at the far right of
+   a wrapping flex row. At tablet widths that put it right against the
+   edge next to a long title, so it could end up squeezed to a sliver or
+   wrapped onto its own line far from where someone would look for it
+   (reported as "the Add button isn't there" on testimonials). Give it its
+   own full-width row under the title at this tier so it is always a full,
+   unmistakable button rather than a possibly-clipped fragment. */
+@media (max-width: 1024px) {
+  .listing-page .page-head { align-items: stretch; }
+  .listing-page .page-head .btn-primary {
+    flex: 1 1 100%;
+    justify-content: center;
+    order: 3;
+  }
+}
+
 /* ---- Small screens ---- */
 @media (max-width: 640px) {
   .listing-page > .card > .filters { padding: var(--space-4) var(--space-4) 0; }
@@ -617,5 +687,29 @@ textarea.input { max-width: 100%; }
   .listing-page .table td:last-child { padding-right: var(--space-4); }
   .listing-page .pager { padding: var(--space-3) var(--space-4); }
   .listing-page .state-box { padding: var(--space-8) var(--space-4); }
-  .listing-page .page-head .btn-primary { flex: 0 0 auto; }
+  .listing-page .page-head .btn-primary { flex: 1 1 100%; }
+}
+
+/* ---- Table: drop lower-priority columns before resorting to scroll ----
+   Dense tables (6-9 columns: courses, categories, instructors, coupons,
+   orders, leads, members, testimonials) don't need every column to stay
+   scannable on tablet. Timestamps and secondary descriptive columns are
+   hidden first via data-col (opt-in per <th>/<td> pair, set in the page's
+   HTML) so the columns someone actually scans first (name, status,
+   actions) fit without a sideways scroll in the common case; the
+   .table-wrap scroll + edge-fade above remains as the fallback for
+   whatever still doesn't fit (long titles, many statuses, narrower phones). */
+@media (max-width: 1024px) {
+  .listing-page .table [data-col="secondary"],
+  .listing-page .table [data-col="tertiary"] { display: none; }
+
+  /* The Actions cell (always the table's last column, every listing page)
+     is exempt from the "every other column stays on one line" rule above:
+     2-3 action buttons forced onto one nowrap line was the single biggest
+     remaining cause of the table outgrowing its card even after dropping
+     the lower-priority columns. Letting them wrap onto a second line
+     keeps the row a little taller but keeps the table itself inside the
+     viewport. */
+  .listing-page .table td:last-child { white-space: normal; }
+  .listing-page .table-actions { flex-wrap: wrap; }
 }

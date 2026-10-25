@@ -395,3 +395,52 @@ if (document.readyState === 'loading') {
 } else {
   ResponsiveNav.init();
 }
+
+/**
+ * Scrollable-table edge fade (Phase 9): every `.table-wrap` on a listing
+ * page can scroll sideways on tablet/mobile (see courses.css), but a flat
+ * cut edge reads as "broken layout", not "scroll for more" — that was the
+ * actual bug behind reports of tables looking cut off / unresponsive.
+ *
+ * This toggles `.can-scroll-left` / `.can-scroll-right` on each `.table-wrap`
+ * based on its real scroll position, and courses.css paints a soft shadow
+ * on whichever edge still has hidden columns. Pure affordance: the scroll
+ * behavior itself (overflow-x: auto) is untouched.
+ */
+(function initTableScrollHints() {
+  function update(wrap) {
+    const max = wrap.scrollWidth - wrap.clientWidth;
+    const canScroll = max > 1;
+    wrap.classList.toggle('can-scroll-left', canScroll && wrap.scrollLeft > 1);
+    wrap.classList.toggle('can-scroll-right', canScroll && wrap.scrollLeft < max - 1);
+  }
+
+  function attach(wrap) {
+    update(wrap);
+    wrap.addEventListener('scroll', () => update(wrap), { passive: true });
+  }
+
+  function init() {
+    const wraps = document.querySelectorAll('.table-wrap');
+    wraps.forEach(attach);
+    if (wraps.length === 0) return;
+
+    // Tables are often (re)populated async after the initial load (every
+    // listing page replaces #rows-body once its API call resolves) and can
+    // change width on resize/orientation change — re-check in both cases.
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(() => wraps.forEach(update)) : null;
+    if (ro) wraps.forEach((w) => ro.observe(w));
+    else window.addEventListener('resize', () => wraps.forEach(update));
+
+    wraps.forEach((wrap) => {
+      const mo = new MutationObserver(() => update(wrap));
+      mo.observe(wrap, { childList: true, subtree: true });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

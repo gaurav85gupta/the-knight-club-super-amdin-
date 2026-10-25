@@ -96,12 +96,12 @@
       els.body.appendChild(Dom.el('tr', {}, [
         Dom.el('td', {}, [Dom.el('div', { class: 'cell-title', text: c.title }), Dom.el('div', { class: 'cell-sub', text: c.slug })]),
         Dom.el('td', { text: (c.category && c.category.name) || '—' }),
-        Dom.el('td', { text: (c.instructor && c.instructor.name) || '—' }),
+        Dom.el('td', { 'data-col': 'tertiary', text: (c.instructor && c.instructor.name) || '—' }),
         Dom.el('td', { text: Dom.formatPrice(c.pricing) }),
         Dom.el('td', {}, [Ui.statusBadge(c.status)]),
-        Dom.el('td', {}, [Ui.visibilityBadge(c.visibility)]),
-        Dom.el('td', { text: Dom.formatDate(c.createdAt) }),
-        Dom.el('td', { text: Dom.formatDate(c.updatedAt) }),
+        Dom.el('td', { 'data-col': 'secondary' }, [Ui.visibilityBadge(c.visibility)]),
+        Dom.el('td', { 'data-col': 'secondary', text: Dom.formatDate(c.createdAt) }),
+        Dom.el('td', { 'data-col': 'secondary', text: Dom.formatDate(c.updatedAt) }),
         Dom.el('td', {}, [rowActions(c)]),
       ]));
     }

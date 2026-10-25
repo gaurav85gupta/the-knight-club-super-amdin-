@@ -127,11 +127,11 @@
       els.body.appendChild(Dom.el('tr', {}, [
         Dom.el('td', {}, [Dom.el('span', { class: 'order-id', text: e.id })]),
         Dom.el('td', {}, [formatStudent(e)]),
-        Dom.el('td', {}, [formatCourse(e)]),
-        Dom.el('td', {}, [sourceCell(e)]),
+        Dom.el('td', { 'data-col': 'secondary' }, [formatCourse(e)]),
+        Dom.el('td', { 'data-col': 'tertiary' }, [sourceCell(e)]),
         Dom.el('td', {}, [Ui.statusBadge(e.status)]),
-        Dom.el('td', {}, [formatAccess(e)]),
-        Dom.el('td', { text: Dom.formatDate(e.enrolledAt) }),
+        Dom.el('td', { 'data-col': 'secondary' }, [formatAccess(e)]),
+        Dom.el('td', { 'data-col': 'secondary', text: Dom.formatDate(e.enrolledAt) }),
         Dom.el('td', {}, [
           Dom.el('a', { class: 'btn btn-outline btn-sm', href: `enrollment-details.html?id=${encodeURIComponent(e.id)}`, text: 'Details' }),
         ]),

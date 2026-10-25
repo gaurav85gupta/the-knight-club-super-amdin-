@@ -160,10 +160,10 @@
           t.role ? Dom.el('div', { class: 'cell-sub', text: t.role }) : null,
         ]),
         Dom.el('td', {}, [typeBadge(t.type)]),
-        Dom.el('td', { text: t.program || '—' }),
-        Dom.el('td', {}, [featuredBadge(t.featured)]),
+        Dom.el('td', { 'data-col': 'secondary', text: t.program || '—' }),
+        Dom.el('td', { 'data-col': 'tertiary' }, [featuredBadge(t.featured)]),
         Dom.el('td', {}, [Ui.statusBadge(t.status)]),
-        Dom.el('td', { text: t.publishedAt ? Dom.formatDate(t.publishedAt) : '—' }),
+        Dom.el('td', { 'data-col': 'secondary', text: t.publishedAt ? Dom.formatDate(t.publishedAt) : '—' }),
         Dom.el('td', {}, [rowActions(t)]),
       ]));
     }

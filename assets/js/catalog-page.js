@@ -95,9 +95,9 @@ const CatalogPage = (() => {
       for (const item of items) {
         const cells = config.columns.map((col) => Dom.el('td', {}, [col.render(item)]));
         cells.push(Dom.el('td', {}, [Ui.statusBadge(item.status)]));
-        cells.push(Dom.el('td', { text: String(item.courseCount ?? 0) }));
-        cells.push(Dom.el('td', { text: Dom.formatDate(item.createdAt) }));
-        cells.push(Dom.el('td', { text: Dom.formatDate(item.updatedAt) }));
+        cells.push(Dom.el('td', { 'data-col': 'tertiary', text: String(item.courseCount ?? 0) }));
+        cells.push(Dom.el('td', { 'data-col': 'secondary', text: Dom.formatDate(item.createdAt) }));
+        cells.push(Dom.el('td', { 'data-col': 'secondary', text: Dom.formatDate(item.updatedAt) }));
         cells.push(Dom.el('td', {}, [rowActions(item)]));
         els.body.appendChild(Dom.el('tr', {}, cells));
       }

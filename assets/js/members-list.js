@@ -94,12 +94,12 @@
     for (const m of items) {
       els.body.appendChild(Dom.el('tr', {}, [
         Dom.el('td', {}, [studentCell(m)]),
-        Dom.el('td', {}, [Dom.el('span', { class: 'order-id', text: m.orderNumber })]),
+        Dom.el('td', { 'data-col': 'tertiary' }, [Dom.el('span', { class: 'order-id', text: m.orderNumber })]),
         Dom.el('td', { text: m.plan ? m.plan.name : '—' }),
-        Dom.el('td', {}, [coursesCell(m)]),
+        Dom.el('td', { 'data-col': 'secondary' }, [coursesCell(m)]),
         Dom.el('td', { text: money(m.amount) }),
         Dom.el('td', {}, [statusBadge(m.status)]),
-        Dom.el('td', { text: Dom.formatDate(m.paidAt || m.createdAt) }),
+        Dom.el('td', { 'data-col': 'secondary', text: Dom.formatDate(m.paidAt || m.createdAt) }),
         Dom.el('td', {}, [
           Dom.el('a', { class: 'btn btn-outline btn-sm', href: `member-details.html?id=${encodeURIComponent(m.orderId)}`, text: 'Details' }),
         ]),

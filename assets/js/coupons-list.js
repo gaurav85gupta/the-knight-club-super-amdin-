@@ -138,10 +138,10 @@
         ]),
         Dom.el('td', { class: 'coupon-discount', text: formatDiscount(c) }),
         Dom.el('td', {}, [Ui.couponStateBadge(c.effectiveState)]),
-        Dom.el('td', { text: formatUsage(c) }),
-        Dom.el('td', { text: formatDateRange(c) }),
-        Dom.el('td', { text: formatScope(c) }),
-        Dom.el('td', { text: Dom.formatDate(c.createdAt) }),
+        Dom.el('td', { 'data-col': 'tertiary', text: formatUsage(c) }),
+        Dom.el('td', { 'data-col': 'secondary', text: formatDateRange(c) }),
+        Dom.el('td', { 'data-col': 'secondary', text: formatScope(c) }),
+        Dom.el('td', { 'data-col': 'secondary', text: Dom.formatDate(c.createdAt) }),
         Dom.el('td', {}, [rowActions(c)]),
       ]));
     }

@@ -151,13 +151,13 @@
     for (const o of items) {
       els.body.appendChild(Dom.el('tr', {}, [
         Dom.el('td', {}, [formatOrderId(o)]),
-        Dom.el('td', {}, [Ui.kindBadge(o.kind)]),
+        Dom.el('td', { 'data-col': 'tertiary' }, [Ui.kindBadge(o.kind)]),
         Dom.el('td', {}, [formatStudent(o)]),
-        Dom.el('td', {}, [formatCourse(o)]),
+        Dom.el('td', { 'data-col': 'secondary' }, [formatCourse(o)]),
         Dom.el('td', {}, [formatAmount(o)]),
-        Dom.el('td', { text: o.couponCode || '—' }),
+        Dom.el('td', { 'data-col': 'secondary', text: o.couponCode || '—' }),
         Dom.el('td', {}, [Ui.paymentStatusBadge(o.status)]),
-        Dom.el('td', { text: Dom.formatDate(o.createdAt) }),
+        Dom.el('td', { 'data-col': 'secondary', text: Dom.formatDate(o.createdAt) }),
         Dom.el('td', {}, [
           Dom.el('a', { class: 'btn btn-outline btn-sm', href: `order-details.html?id=${encodeURIComponent(o.id)}`, text: 'Details' }),
         ]),
