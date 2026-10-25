@@ -174,6 +174,13 @@ progress {
    collapsed to 0 width only at the desktop rail tier — see the
    ≥1025px rail block below — so the same markup serves both. */
 .sidebar {
+  /* Sticks the rail to the viewport instead of letting it scroll away
+     with .main-content: .app-shell is a grid, so the sidebar's grid
+     cell is as tall as the page, but position:sticky pins the sidebar
+     itself to the top of the viewport within that cell. */
+  position: sticky;
+  top: 0;
+  height: 100vh;
   overflow-y: auto;         /* sidebar scrolls on its own if the menu is taller than the screen */
   overscroll-behavior: contain;
   /* Slim, translucent scrollbar that blends into the purple panel (the
