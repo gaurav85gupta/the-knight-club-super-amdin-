@@ -269,12 +269,12 @@ const Ui = (() => {
  *   <aside class="sidebar" id="sidebar-nav"> ... (unchanged) ... </aside>
  *   <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
  *
- * Desktop (>1024px): .sidebar is a permanent icon-only rail there (its own
- * .app-shell grid column, not a drawer) and .menu-toggle is hidden by
- * base.css, so this module has nothing to open/close above that width —
- * it only guarantees the drawer isn't left open from a narrower viewport
- * if the window is resized past 1024px while it was open (resize listener
- * below).
+ * Desktop (>1024px): .sidebar is a permanent icon-only rail (its own
+ * .app-shell grid column). .menu-toggle is shown there too: it toggles the
+ * same .is-open class, which base.css turns into the full-label expanded
+ * sidebar (overlay + backdrop) at that width. Crossing the 1024px
+ * breakpoint in either direction closes it (resize listener below) so it
+ * is never left open in the wrong layout.
  *
  * Safe to call more than once: init() is idempotent and only ever attaches
  * its listeners a single time per page load (early-return via a module-level
@@ -377,15 +377,11 @@ const ResponsiveNav = (() => {
       link.addEventListener('click', () => close({ restoreFocus: false }));
     });
 
-    // The drawer is closed by default at every width; this just makes sure
-    // resizing the window never leaves it stuck open from a narrower size
-    // it was opened at — it does not force any particular state, since
-    // "closed unless the hamburger opened it" is now true at every width,
-    // not only below the old desktop breakpoint.
+    // Closed by default at every width. Crossing the desktop breakpoint in
+    // either direction closes it, since the open state looks different on
+    // each side (drawer vs expanded rail) and should not carry across.
     const mq = window.matchMedia(DESKTOP_QUERY);
-    const onViewportChange = (e) => {
-      if (e.matches) close({ restoreFocus: false });
-    };
+    const onViewportChange = () => close({ restoreFocus: false });
     if (mq.addEventListener) mq.addEventListener('change', onViewportChange);
     else if (mq.addListener) mq.addListener(onViewportChange); // older Safari
   }

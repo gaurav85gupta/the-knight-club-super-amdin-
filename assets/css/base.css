@@ -79,9 +79,10 @@ progress {
    Desktop (≥1025px): the sidebar is a permanent icon-only rail that
    reserves its own grid column (see --sidebar-rail-width in tokens.css),
    so .main-content sits beside it rather than centering alone with the
-   sidebar hidden behind a hamburger. No overlay, no hamburger at this
-   tier — see the RESPONSIVE ARCHITECTURE block for the ≤1024px drawer
-   behavior, which is unchanged (off-canvas, opened via .menu-toggle).
+   sidebar hidden behind a hamburger. The hamburger (.menu-toggle) expands
+   the rail into the full-label sidebar as an overlay — see "Desktop
+   expanded sidebar" — and opens the off-canvas drawer at ≤1024px (see the
+   RESPONSIVE ARCHITECTURE block).
    The grid-template-columns value here is the desktop default; the
    ≤1024px tier in RESPONSIVE ARCHITECTURE overrides it back to 1fr. */
 .app-shell {
@@ -480,16 +481,15 @@ progress {
 }
 
 /* ---- Hamburger / menu toggle ----
-   Desktop (≥1025px) hides this: the sidebar is a permanent icon-only
-   rail there (see .app-shell / .sidebar above), so there's no drawer
-   to open and the button would be dead weight in the topbar. It's
-   shown again at ≤1024px, where the sidebar is still the off-canvas
-   drawer (RESPONSIVE ARCHITECTURE block below) and needs a way to
-   open. Uses the same button sizing language as .btn-outline/.btn-sm
-   elsewhere in the app but is its own class since it's icon-only and
-   always square. */
+   Visible at every width. Desktop (≥1025px): the sidebar stays a
+   permanent icon-only rail and this button expands it in place into the
+   full-label sidebar (an overlay above the page, see the "Desktop
+   expanded sidebar" block below). ≤1024px: the sidebar is the off-canvas
+   drawer (RESPONSIVE ARCHITECTURE block) and this button opens it. Uses
+   the same button sizing language as .btn-outline/.btn-sm elsewhere in
+   the app but is its own class since it's icon-only and always square. */
 .menu-toggle {
-  display: none;
+  display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
@@ -502,12 +502,6 @@ progress {
   color: var(--color-text);
   cursor: pointer;
   transition: background var(--transition-fast), border-color var(--transition-fast);
-}
-
-@media (max-width: 1024px) {
-  .menu-toggle {
-    display: inline-flex;
-  }
 }
 
 .menu-toggle:hover {
@@ -741,6 +735,72 @@ progress {
 @media (prefers-reduced-motion: reduce) {
   .sidebar {
     transition: none;
+  }
+}
+
+/* ---- Desktop expanded sidebar (≥1025px) ----
+   The hamburger toggles .is-open on the rail (ui.js, same mechanism as
+   the ≤1024px drawer). Expanded = full labels, wider panel. The grid
+   column stays rail-width, so page content never reflows: the sidebar
+   grows over it (explicit width + a negative margin-right that cancels
+   the extra width, keeping it sticky and inside the grid). The shared
+   .drawer-backdrop dims the page behind it. */
+@media (min-width: 1025px) {
+  /* The hamburger lives at the top of the rail, above the logo, instead
+     of floating beside the page heading. It stays in each page's topbar
+     markup (≤1024px it still sits there for the drawer) and is lifted
+     into the rail here with position: fixed — the sidebar is sticky at
+     top: 0, so the two stay aligned while the page scrolls. It sits above
+     the open sidebar (z-index) so it doubles as the close (X) button. */
+  .menu-toggle {
+    position: fixed;
+    top: var(--space-4);
+    left: var(--space-4);
+    z-index: 1310;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--sidebar-hover-bg);
+    border-color: var(--sidebar-border);
+    color: var(--sidebar-text-strong);
+  }
+  .menu-toggle:hover {
+    background: var(--sidebar-active-bg);
+  }
+  .menu-toggle:focus-visible {
+    outline-color: var(--sidebar-text-strong);
+  }
+  /* Room for the button above the logo (button top 1rem + 2.5rem tall). */
+  .sidebar {
+    padding-top: calc(var(--space-4) + 2.5rem + var(--space-4));
+  }
+  .sidebar {
+    transition: width var(--duration-base) var(--ease-standard),
+                margin-right var(--duration-base) var(--ease-standard),
+                box-shadow var(--duration-base) var(--ease-standard);
+  }
+  .sidebar.is-open {
+    z-index: 1300;
+    width: var(--sidebar-width);
+    margin-right: calc(var(--sidebar-rail-width) - var(--sidebar-width));
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+    box-shadow: var(--shadow-xl);
+  }
+  .sidebar.is-open .brand {
+    justify-content: flex-start;
+    font-size: 1.125rem;
+    padding: 0 var(--space-2) var(--space-5);
+  }
+  .sidebar.is-open .brand::before {
+    width: 2.75rem;
+    height: 2.5rem;
+    margin-right: var(--space-3);
+  }
+  .sidebar.is-open nav a,
+  .sidebar.is-open nav .nav-disabled {
+    justify-content: flex-start;
+    font-size: var(--font-size-sm);
+    padding: 0.5625rem var(--space-3);
   }
 }
 
