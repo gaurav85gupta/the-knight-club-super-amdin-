@@ -154,6 +154,28 @@ const Ui = (() => {
   }
 
   /**
+   * Pre-booking purchase-stage badge (Phase 3 Part G) — the REAL
+   * Order.purchaseStage enum from membershipBooking.service.js, same
+   * discipline as paymentStatusBadge/leadStatusBadge above: the frontend
+   * never invents its own staging vocabulary.
+   */
+  const PREBOOKING_STAGE_LABELS = Object.freeze({
+    PRE_BOOKING_PENDING_PAYMENT: 'Awaiting pre-booking payment',
+    PRE_BOOKED: 'Pre-booked',
+    COURSE_SELECTION_COMPLETE: 'Courses selected',
+    REMAINING_PAYMENT_PENDING: 'Awaiting balance',
+    FULLY_PAID: 'Fully paid',
+  });
+
+  function stageBadge(stage) {
+    const s = String(stage || '');
+    return Dom.el('span', {
+      class: `badge badge-sm badge-stage-${s.toLowerCase().replace(/_/g, '-')}`,
+      text: PREBOOKING_STAGE_LABELS[s] || s,
+    });
+  }
+
+  /**
    * Enquiry type labels (Phase L4 — spec Step 9): the backend's raw
    * ENQUIRY_TYPES enum values (general/course/payment/support/club/other)
    * mapped to the human-readable labels the spec requires. The frontend
@@ -252,7 +274,7 @@ const Ui = (() => {
 
   return {
     confirm, notify, statusBadge, visibilityBadge, couponStateBadge, paymentStatusBadge,
-    leadStatusBadge, ENQUIRY_TYPE_LABELS, messageForError, copyToClipboard,
+    leadStatusBadge, stageBadge, ENQUIRY_TYPE_LABELS, messageForError, copyToClipboard,
     kindBadge, sourceBadge, memberBadge,
   };
 })();

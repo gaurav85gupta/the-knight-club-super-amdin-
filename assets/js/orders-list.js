@@ -226,6 +226,130 @@
   els.prev.addEventListener('click', () => { if (state.page > 1) { state.page -= 1; load(); } });
   els.next.addEventListener('click', () => { if (state.page < state.totalPages) { state.page += 1; load(); } });
 
+  // ===========================================================================
+  // Phase 3 Part G — Pre-Bookings panel
+  // Separate, Order-keyed state from the Payment-keyed table above. Its own
+  // criteria/page/load — does not share `state`/`seq`/`criteria()` with the
+  // main table so the two panels' requests never race each other.
+  // ===========================================================================
+  const pb = {
+    alert: els.alert, // reuses the page's one alert banner
+    body: $('pb-admin-body'), table: $('pb-admin-table'), state: $('pb-admin-state'),
+    pager: $('pb-admin-pager'), info: $('pb-admin-pager-info'), page: $('pb-admin-pager-page'),
+    prev: $('pb-admin-prev'), next: $('pb-admin-next'), stage: $('pb-admin-stage'),
+  };
+
+  // Only render the panel's own controls if they exist on this page — keeps
+  // this file safe to load on any page that happens to include it.
+  if (pb.body) {
+    const PB_LIMIT = 20;
+    const pbState = { page: 1, totalPages: 0 };
+    let pbSeq = 0;
+
+    const pbCriteria = () => ({ stage: pb.stage.value, page: pbState.page, limit: PB_LIMIT });
+
+    function pbShowState(title, text) {
+      Dom.clear(pb.state);
+      pb.state.appendChild(Dom.el('h3', { text: title }));
+      pb.state.appendChild(Dom.el('p', { text }));
+      pb.state.hidden = false;
+    }
+
+    function pbSetBusy(isBusy) {
+      pb.table.classList.toggle('is-loading', isBusy);
+      pb.table.setAttribute('aria-busy', String(isBusy));
+    }
+
+    function pbMoney(paise) {
+      return typeof paise === 'number' ? `₹${Dom.paiseToRupees(paise)}` : '—';
+    }
+
+    function pbFormatStudent(o) {
+      if (!o.student) return Dom.el('span', { class: 'cell-sub', text: 'Deleted student' });
+      return Dom.el('div', {}, [
+        Dom.el('div', { class: 'cell-title', text: o.student.fullName || o.student.userId }),
+        Dom.el('div', { class: 'cell-sub', text: o.student.userId }),
+      ]);
+    }
+
+    function pbFormatOrderId(o) {
+      const idClass = o.requiresSupportReview ? 'order-id order-id-flagged' : 'order-id';
+      const box = Dom.el('div', {}, [Dom.el('span', { class: idClass, text: o.orderId })]);
+      if (o.orderNumber) box.appendChild(Dom.el('div', { class: 'cell-sub', text: o.orderNumber }));
+      return box;
+    }
+
+    function pbRenderRows(items) {
+      Dom.clear(pb.body);
+      for (const o of items) {
+        const row = [
+          Dom.el('td', {}, [pbFormatOrderId(o)]),
+          Dom.el('td', {}, [pbFormatStudent(o)]),
+          Dom.el('td', {}, [
+            o.integrityIssue
+              ? Dom.el('span', { class: 'badge badge-sm badge-payment-failed', text: 'Needs review' })
+              : Ui.stageBadge(o.purchaseStage),
+          ]),
+          Dom.el('td', {}, [Dom.el('span', { text: o.integrityIssue ? '—' : `${pbMoney(o.verifiedCapturedTotal)} / ${pbMoney(o.membershipPrice)}` })]),
+          Dom.el('td', { 'data-col': 'secondary' }, [Dom.el('span', { text: o.integrityIssue ? '—' : pbMoney(o.remainingBalance) })]),
+          Dom.el('td', { 'data-col': 'secondary', text: Dom.formatDate(o.createdAt) }),
+          Dom.el('td', {}, [
+            Dom.el('a', { class: 'btn btn-outline btn-sm', href: `order-details.html?id=${encodeURIComponent(o.orderId)}`, text: 'Details' }),
+          ]),
+        ];
+        pb.body.appendChild(Dom.el('tr', {}, row));
+      }
+    }
+
+    async function pbLoad() {
+      const mine = ++pbSeq;
+      pb.state.hidden = true;
+      pbSetBusy(true);
+      if (!pb.body.firstChild) pbShowState('Loading pre-bookings…', 'Please wait.');
+
+      try {
+        const data = await OrderApi.preBookings(pbCriteria());
+        if (mine !== pbSeq) return;
+
+        const { items, pagination } = data;
+        pbState.totalPages = pagination.totalPages;
+
+        if (items.length === 0 && pagination.total > 0 && pbState.page > 1) {
+          pbState.page = Math.max(1, pagination.totalPages);
+          return pbLoad();
+        }
+
+        pbRenderRows(items);
+        pb.pager.hidden = pagination.total === 0;
+        pb.info.textContent = `${pagination.total} booking${pagination.total === 1 ? '' : 's'}`;
+        pb.page.textContent = `Page ${pagination.page} of ${Math.max(1, pagination.totalPages)}`;
+        pb.prev.disabled = pagination.page <= 1;
+        pb.next.disabled = pagination.page >= pagination.totalPages;
+
+        if (items.length === 0) {
+          pbShowState('No pre-bookings found', pb.stage.value ? 'No booking matches this stage filter.' : 'No one has started a 1% Club pre-booking yet.');
+        } else {
+          pb.state.hidden = true;
+        }
+      } catch (err) {
+        if (mine !== pbSeq) return;
+        Dom.clear(pb.body);
+        pb.pager.hidden = true;
+        if (Auth.handleSessionError(err)) return;
+        Forms.showAlert(pb.alert, Ui.messageForError(err, 'pre-booking'), 'error');
+        pbShowState('Could not load pre-bookings', 'Check your connection and try again.');
+      } finally {
+        if (mine === pbSeq) pbSetBusy(false);
+      }
+    }
+
+    pb.stage.addEventListener('change', () => { pbState.page = 1; pbLoad(); });
+    pb.prev.addEventListener('click', () => { if (pbState.page > 1) { pbState.page -= 1; pbLoad(); } });
+    pb.next.addEventListener('click', () => { if (pbState.page < pbState.totalPages) { pbState.page += 1; pbLoad(); } });
+
+    await pbLoad();
+  }
+
   await loadCourseOptions();
   await load();
 })();

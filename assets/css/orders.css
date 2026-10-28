@@ -20,8 +20,16 @@
 .badge-payment-cancelled { background: var(--color-surface-sunken); color: var(--color-text-muted); }
 .badge-payment-expired { background: var(--color-surface-sunken); color: var(--color-text-muted); }
 
+/* ---- Pre-booking purchase-stage badges (Phase 3 Part G) ---- */
+.badge-stage-pre-booking-pending-payment { background: var(--color-warning-bg); color: var(--color-warning-text); }
+.badge-stage-pre-booked { background: var(--color-accent-50); color: var(--color-accent-700); }
+.badge-stage-course-selection-complete { background: var(--color-accent-50); color: var(--color-accent-700); }
+.badge-stage-remaining-payment-pending { background: var(--color-warning-bg); color: var(--color-warning-text); }
+.badge-stage-fully-paid { background: var(--color-success-bg); color: var(--color-success-text); }
+
 /* ---- Order id / Razorpay id cells ---- */
 .order-id { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.8125rem; }
+.order-id-flagged { color: var(--color-error-text); }
 .order-amount { font-variant-numeric: tabular-nums; }
 .order-amount-final { font-weight: 600; }
 .order-amount-discount { color: var(--color-text-muted); font-size: 0.8125rem; }

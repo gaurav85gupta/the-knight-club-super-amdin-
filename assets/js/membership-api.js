@@ -81,6 +81,27 @@ const MembershipApi = (() => {
   }
 
   /**
+   * Get the plan's pre-booking configuration.
+   * @param {string} id
+   * @returns {Promise<{planId, planName, currency, membershipPrice, enabled,
+   *   amount, remainingAmount, usable, issue}>}
+   */
+  function getPreBooking(id) {
+    return Api.get(`${one(id)}/pre-booking`);
+  }
+
+  /**
+   * Update the plan's pre-booking configuration. Only `enabled` and/or
+   * `amount` may be sent — the backend rejects any other field.
+   * @param {string} id
+   * @param {{enabled?: boolean, amount?: number|null}} body  amount in paise
+   * @returns {Promise<object>}
+   */
+  function updatePreBooking(id, body) {
+    return Api.patch(`${one(id)}/pre-booking`, body);
+  }
+
+  /**
    * Load all courses for the eligible-courses picker.
    * Uses the existing admin courses listing — limit=200, status=PUBLISHED.
    * Falls back to status=ALL if the query returns 0 results.
@@ -245,6 +266,8 @@ const MembershipApi = (() => {
     updatePlan,
     activatePlan,
     deactivatePlan,
+    getPreBooking,
+    updatePreBooking,
     loadAllCourses,
     // Phase 39
     updateContent,

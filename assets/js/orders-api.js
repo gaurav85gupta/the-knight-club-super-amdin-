@@ -24,10 +24,26 @@ const OrderApi = (() => {
     return s ? `?${s}` : '';
   }
 
+  /** Builds ?a=b for the pre-bookings endpoint's own small parameter set. */
+  function toPreBookingsQuery(params) {
+    const allowed = ['stage', 'page', 'limit'];
+    const qs = new URLSearchParams();
+    for (const key of allowed) {
+      const v = params[key];
+      if (v !== undefined && v !== null && String(v).trim() !== '') qs.set(key, String(v).trim());
+    }
+    const s = qs.toString();
+    return s ? `?${s}` : '';
+  }
+
   return {
     list: (params = {}) => Api.get(`${BASE}${toQuery(params)}`),
     get: (id) => Api.get(`${BASE}/${encodeURIComponent(id)}`),
     totals: (params = {}) => Api.get(`${BASE}/totals${toQuery(params)}`),
     courses: () => Api.get(`${BASE}/options/courses`),
+    // Phase 3 Part G: staged (pre-booking) orders — a separate, Order-keyed
+    // read model. See membershipBooking.service.js#listStagedOrdersForAdmin
+    // for why this isn't a `status` value on the main `list` endpoint above.
+    preBookings: (params = {}) => Api.get(`${BASE}/pre-bookings${toPreBookingsQuery(params)}`),
   };
 })();

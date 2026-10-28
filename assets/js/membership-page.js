@@ -290,6 +290,8 @@
     window.__activePlan = p;
     // Phase 39: populate content/media sections (no-op if Phase 39 not loaded).
     if (window.__phase39 && window.__phase39.init) window.__phase39.init(p);
+    // Phase 3: populate pre-booking section (no-op if Phase 3 not loaded).
+    if (window.__phase3 && window.__phase3.init) window.__phase3.init(p);
 
     if (nameInput)      nameInput.value       = p.name || '';
     if (slugInput)      slugInput.value       = p.slug || '';
@@ -1108,5 +1110,186 @@
 })(function getActivePlan() {
   // Reads the current plan from the Phase 38 IIFE via a shared accessor.
   // If Phase 38 sets window.__activePlan we use it. Otherwise null.
+  return window.__activePlan || null;
+});
+
+// =============================================================================
+// PHASE 3 — Pre-Booking Configuration
+// Appended independently of Phase 39. Reads/writes GET+PATCH
+// /admin/memberships/:id/pre-booking via MembershipApi.getPreBooking /
+// updatePreBooking. Saved separately from the main plan form, same pattern
+// as the Phase 39 "Page Content" section (its own button, its own request).
+// =============================================================================
+
+(function initPhase3(getActivePlan) {
+  'use strict';
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  var enabledInput    = $('pb-enabled');
+  var amountInput     = $('pb-amount');
+  var amountError     = $('pb-amount-error');
+  var membershipPriceEl = $('pb-membership-price');
+  var remainingEl     = $('pb-remaining');
+  var statusIssueEl   = $('pb-status-issue');
+  var saveBtn         = $('save-prebooking-btn');
+  var sectionWrap      = $('sec-prebooking-wrap');
+
+  function planId() {
+    var p = getActivePlan();
+    return p && (p.id || p._id);
+  }
+
+  function clearErrors() {
+    if (amountError) amountError.textContent = '';
+    if (statusIssueEl) statusIssueEl.textContent = '';
+  }
+
+  // Money display mirrors Dom.formatPrice's "₹4,999" convention — whole
+  // rupees only (pre-booking amounts are always whole-rupee per the form).
+  function formatRupees(paise) {
+    if (typeof paise !== 'number' || !Number.isFinite(paise)) return '\u2014';
+    return '\u20B9' + Math.round(paise / 100).toLocaleString('en-IN');
+  }
+
+  /**
+   * Recomputes the "Remaining Balance" preview from whatever is currently
+   * typed in the amount field against the plan's current price — this is
+   * a convenience preview only; the server is always the source of truth
+   * for any real booking's balance (see the section hint in the HTML).
+   */
+  function refreshRemainingPreview() {
+    var p = getActivePlan();
+    var price = p && typeof p.price === 'number' ? p.price : null;
+    var amountPaise = amountInput ? Dom.rupeesToPaise(amountInput.value.trim()) : null;
+    if (remainingEl) {
+      remainingEl.textContent = (price !== null && amountPaise !== null && amountPaise > 0 && amountPaise < price)
+        ? formatRupees(price - amountPaise)
+        : '\u2014';
+    }
+  }
+
+  /**
+   * Populates the section from the plan's embedded settings (price) plus a
+   * fresh GET of the pre-booking config itself — called after the plan
+   * loads/reloads, mirroring Phase 39's populatePhase39(plan) hook.
+   */
+  async function populatePhase3(plan) {
+    if (!sectionWrap) return;
+    var id = plan && (plan.id || plan._id);
+    if (!id) {
+      // No saved plan yet (new plan form): nothing to load, keep fields at
+      // their defaults and let the hint explain why.
+      if (enabledInput) enabledInput.checked = false;
+      if (amountInput) amountInput.value = '';
+      if (membershipPriceEl) membershipPriceEl.textContent = '\u2014';
+      if (remainingEl) remainingEl.textContent = '\u2014';
+      clearErrors();
+      return;
+    }
+
+    if (membershipPriceEl) {
+      membershipPriceEl.textContent = typeof plan.price === 'number' ? formatRupees(plan.price) : '\u2014';
+    }
+
+    try {
+      var settings = await MembershipApi.getPreBooking(id);
+      if (enabledInput) enabledInput.checked = settings.enabled === true;
+      if (amountInput) {
+        amountInput.value = typeof settings.amount === 'number' ? String(Math.round(settings.amount / 100)) : '';
+      }
+      clearErrors();
+      if (statusIssueEl && settings.enabled && !settings.usable) {
+        statusIssueEl.textContent = 'Pre-booking is enabled but not currently usable: ' +
+          (settings.issue || 'the amount is missing or invalid') + '. Students will not see the Pre-Book option until this is fixed.';
+      }
+      refreshRemainingPreview();
+    } catch (err) {
+      if (typeof Auth !== 'undefined' && Auth.handleSessionError && Auth.handleSessionError(err)) return;
+      Ui.notify('Could not load pre-booking settings: ' + ((err && err.message) || 'Unknown error'), 'error');
+    }
+  }
+
+  async function savePreBooking() {
+    var id = planId();
+    if (!id) { Ui.notify('No active plan. Please save the plan first.', 'error'); return; }
+    if (!saveBtn) return;
+
+    clearErrors();
+
+    var enabled = !!(enabledInput && enabledInput.checked);
+    var amountText = (amountInput && amountInput.value.trim()) || '';
+
+    var body = { enabled: enabled };
+
+    if (amountText) {
+      var amountPaise = Dom.rupeesToPaise(amountText);
+      if (amountPaise === null || amountPaise <= 0) {
+        if (amountError) amountError.textContent = 'Pre-booking amount must be a positive whole rupee amount (e.g. 999).';
+        return;
+      }
+      body.amount = amountPaise;
+    } else if (enabled) {
+      // Backend requires an amount whenever enabled=true; fail fast with a
+      // field-level message instead of a round trip for an error we can
+      // already see coming.
+      if (amountError) amountError.textContent = 'A pre-booking amount is required to enable pre-booking.';
+      return;
+    } else {
+      // Disabling with no amount typed: clear the stored amount too, same
+      // as leaving the field blank on a fresh plan.
+      body.amount = null;
+    }
+
+    var origLabel = saveBtn.textContent;
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving\u2026';
+
+    try {
+      var updated = await MembershipApi.updatePreBooking(id, body);
+      // Reload persisted state from the response so the UI reflects exactly
+      // what the server stored (never assume the request body == saved state).
+      if (enabledInput) enabledInput.checked = updated.enabled === true;
+      if (amountInput) {
+        amountInput.value = typeof updated.amount === 'number' ? String(Math.round(updated.amount / 100)) : '';
+      }
+      if (statusIssueEl) {
+        statusIssueEl.textContent = (updated.enabled && !updated.usable)
+          ? 'Pre-booking is enabled but not currently usable: ' + (updated.issue || 'the amount is missing or invalid') + '.'
+          : '';
+      }
+      refreshRemainingPreview();
+      saveBtn.textContent = 'Saved \u2713';
+      setTimeout(function () {
+        saveBtn.textContent = origLabel;
+        saveBtn.disabled = false;
+      }, 2000);
+    } catch (err) {
+      saveBtn.textContent = origLabel;
+      saveBtn.disabled = false;
+      if (typeof Auth !== 'undefined' && Auth.handleSessionError && Auth.handleSessionError(err)) return;
+      // Validation errors (422): show inline on the amount field when the
+      // backend names it, otherwise fall back to a toast.
+      var fieldMsg = err && err.errors && Array.isArray(err.errors)
+        ? (err.errors.find(function (d) { return d.field === 'amount'; }) || {}).message
+        : null;
+      if (fieldMsg && amountError) {
+        amountError.textContent = fieldMsg;
+      } else {
+        Ui.notify('Failed to save pre-booking settings: ' + ((err && err.message) || 'Unknown error'), 'error');
+      }
+    }
+  }
+
+  function wirePhase3Events() {
+    if (saveBtn) saveBtn.addEventListener('click', savePreBooking);
+    if (amountInput) amountInput.addEventListener('input', function () { clearErrors(); refreshRemainingPreview(); });
+    if (enabledInput) enabledInput.addEventListener('change', clearErrors);
+  }
+
+  window.__phase3 = { init: populatePhase3, wireEvents: wirePhase3Events };
+  wirePhase3Events();
+
+})(function getActivePlan() {
   return window.__activePlan || null;
 });

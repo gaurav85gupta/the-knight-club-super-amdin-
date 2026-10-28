@@ -196,6 +196,66 @@
         </section>
 
         <!-- ================================================================
+             SECTION 2B — Pre-Booking (Phase 3)
+             ================================================================ -->
+        <section class="card membership-section" id="sec-prebooking-wrap" aria-labelledby="sec-prebooking">
+          <h3 id="sec-prebooking" class="membership-section-title">Pre-Booking</h3>
+          <p class="membership-section-hint">
+            Let a student reserve a seat with a smaller upfront payment, then pay the remaining
+            balance and choose their courses afterward. A pre-booking is never an activated
+            membership — the server only activates it once the full membership price has been
+            verified as captured. Save the plan first; pre-booking settings are saved separately.
+          </p>
+
+          <div class="field">
+            <div class="checkbox-field">
+              <input type="checkbox" id="pb-enabled" aria-describedby="pb-enabled-hint" />
+              <label for="pb-enabled">Enable pre-booking for this plan</label>
+            </div>
+            <p class="hint" id="pb-enabled-hint">When off, the public page shows no Pre-Book option and new pre-bookings are rejected server-side.</p>
+          </div>
+
+          <div class="form-row" style="margin-top: var(--space-4);">
+            <div class="field">
+              <label>Current Membership Price</label>
+              <p class="input" id="pb-membership-price" style="background: var(--surface-muted, #f4f4f5); cursor: default;">—</p>
+              <p class="hint">For context only. Read from the Pricing section above.</p>
+            </div>
+
+            <div class="field">
+              <label for="pb-amount">Pre-Booking Amount (₹)</label>
+              <div class="money-field has-label">
+                <input
+                  class="input"
+                  id="pb-amount"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="12"
+                  placeholder="e.g. 999"
+                  aria-describedby="pb-amount-hint pb-amount-error"
+                />
+              </div>
+              <p class="hint" id="pb-amount-hint">Must be a positive whole rupee amount, less than the membership price.</p>
+              <p class="field-error" id="pb-amount-error" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top: var(--space-2);">
+            <label>Remaining Balance for a New Booking</label>
+            <p class="input" id="pb-remaining" style="background: var(--surface-muted, #f4f4f5); cursor: default;">—</p>
+            <p class="hint" id="pb-remaining-hint">Membership price minus the pre-booking amount. Calculated here for reference — the server always computes the actual balance from each booking's own price snapshot.</p>
+          </div>
+
+          <p class="field-error" id="pb-status-issue" role="alert" style="margin-top: var(--space-2);"></p>
+
+          <div class="action-bar" style="margin-top: var(--space-4); padding: 0; background: none; border: none; box-shadow: none;">
+            <button type="button" id="save-prebooking-btn" class="btn btn-primary btn-sm">
+              <span class="label">Save Pre-Booking Settings</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- ================================================================
              SECTION 3 — Course Configuration
              ================================================================ -->
         <section class="card membership-section" aria-labelledby="sec-courses">

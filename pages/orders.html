@@ -59,6 +59,53 @@
 
       <div class="order-totals-grid" id="totals-grid" hidden></div>
 
+      <!-- ================================================================
+           Pre-Bookings panel (Phase 3 Part G).
+           Separate, Order-keyed view: the table below is Payment-keyed and
+           cannot represent a staged order with zero payment attempts yet
+           (see membershipBooking.service.js#listStagedOrdersForAdmin for
+           why). This panel is additive — it does not touch the table or
+           its filters below.
+           ================================================================ -->
+      <div class="card" id="pb-admin-card">
+        <div class="page-head" style="margin-bottom: var(--space-3);">
+          <h2 style="margin:0; font-size: 1.1rem;">1% Club Pre-Bookings</h2>
+          <select class="input" id="pb-admin-stage" aria-label="Filter by booking stage" style="max-width: 16rem;">
+            <option value="">All stages</option>
+            <option value="PRE_BOOKING_PENDING_PAYMENT">Awaiting pre-booking payment</option>
+            <option value="PRE_BOOKED">Pre-booked — awaiting course selection</option>
+            <option value="COURSE_SELECTION_COMPLETE">Courses selected — awaiting balance</option>
+            <option value="REMAINING_PAYMENT_PENDING">Awaiting remaining payment</option>
+            <option value="FULLY_PAID">Fully paid</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="table" id="pb-admin-table" aria-busy="false">
+            <thead>
+              <tr>
+                <th scope="col">Order</th>
+                <th scope="col">Student</th>
+                <th scope="col">Stage</th>
+                <th scope="col">Captured / Price</th>
+                <th scope="col" data-col="secondary">Remaining</th>
+                <th scope="col" data-col="secondary">Date</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody id="pb-admin-body"></tbody>
+          </table>
+        </div>
+        <div id="pb-admin-state" class="state-box" hidden></div>
+        <div class="pager" id="pb-admin-pager" hidden>
+          <span id="pb-admin-pager-info"></span>
+          <div class="pager-buttons">
+            <button type="button" id="pb-admin-prev" class="btn btn-outline btn-sm">Previous</button>
+            <span id="pb-admin-pager-page"></span>
+            <button type="button" id="pb-admin-next" class="btn btn-outline btn-sm">Next</button>
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="filters filters-orders" role="search">
           <input class="input" id="f-search" type="search" placeholder="Search order ID, Razorpay ID, student, course…" maxlength="100" aria-label="Search orders" />
