@@ -86,6 +86,8 @@
 
     Dom.clear($('d-status'));
     $('d-status').appendChild(Ui.statusBadge(s.status));
+    const incompleteBadge = Ui.profileIncompleteBadge(s.needsProfileCompletion);
+    if (incompleteBadge) $('d-status').appendChild(incompleteBadge);
     $('d-created').textContent = Dom.formatDateTime(s.createdAt);
     $('d-last-login').textContent = s.lastLoginAt ? Dom.formatDateTime(s.lastLoginAt) : 'Never';
 

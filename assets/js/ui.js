@@ -83,6 +83,22 @@ const Ui = (() => {
   }
 
   /**
+   * "Incomplete" badge for a Google-signup student whose mobile/state are
+   * still unset (Student.toSafeStudent().needsProfileCompletion, forwarded
+   * by adminStudent.service.js#toAdminStudentListItem). Orthogonal to
+   * statusBadge(student.status) — a row can be ACTIVE *and* incomplete at
+   * the same time, which is exactly the case this exists to surface: an
+   * admin scanning the student list could previously not tell a genuinely
+   * active student apart from a Google signup still missing its profile.
+   * Returns null (render nothing) when the profile is complete, so callers
+   * can append it unconditionally.
+   */
+  function profileIncompleteBadge(needsProfileCompletion) {
+    if (!needsProfileCompletion) return null;
+    return Dom.el('span', { class: 'badge badge-sm badge-profile-incomplete', text: 'Incomplete profile' });
+  }
+
+  /**
    * Coupon EFFECTIVE state badge (Phase 19 — spec Step 4: Active / Inactive /
    * Scheduled / Expired / Usage limit reached). Distinct from statusBadge:
    * a coupon's displayed state is the SERVER-DERIVED `effectiveState` the
@@ -302,7 +318,7 @@ const Ui = (() => {
   }
 
   return {
-    confirm, notify, statusBadge, visibilityBadge, couponStateBadge, paymentStatusBadge,
+    confirm, notify, statusBadge, visibilityBadge, profileIncompleteBadge, couponStateBadge, paymentStatusBadge,
     leadStatusBadge, stageBadge, ENQUIRY_TYPE_LABELS, messageForError, copyToClipboard,
     kindBadge, sourceBadge, memberBadge, authProviderBadge,
   };

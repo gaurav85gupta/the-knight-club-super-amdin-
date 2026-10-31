@@ -80,7 +80,7 @@
         Dom.el('td', { 'data-col': 'tertiary' }, [Dom.el('span', { class: 'order-id', text: s.userId || '—' })]),
         Dom.el('td', { 'data-col': 'secondary' }, [Ui.authProviderBadge(s)]),
         Dom.el('td', { 'data-col': 'secondary', text: s.mobile || '—' }),
-        Dom.el('td', {}, [Ui.statusBadge(s.status)]),
+        Dom.el('td', {}, [Ui.statusBadge(s.status), Ui.profileIncompleteBadge(s.needsProfileCompletion)]),
         Dom.el('td', { 'data-col': 'secondary', text: String(s.enrollmentCount) }),
         Dom.el('td', { 'data-col': 'secondary', text: String(s.purchaseCount) }),
         Dom.el('td', { 'data-col': 'secondary', text: Dom.formatDate(s.createdAt) }),

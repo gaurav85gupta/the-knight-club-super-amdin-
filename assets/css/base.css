@@ -951,6 +951,17 @@ progress {
 .badge-signin-email  { background: var(--color-info-bg); color: var(--color-info-text); }
 .badge-signin-google  { background: var(--color-success-bg); color: var(--color-success-text); }
 
+/* Flags a Google-signup student whose profile (mobile/state) is still
+   incomplete — distinct from .badge-active/.badge-suspended (Student.status)
+   since this is a separate, orthogonal fact about the SAME active row.
+   Same warning treatment as .badge-draft / .badge-coupon-scheduled, which
+   mark other "not yet finished" states. */
+.badge-profile-incomplete {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  margin-left: var(--space-2, 0.5rem);
+}
+
 /* Section tab strip */
 .section-tabs { display: flex; gap: var(--space-2); margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); }
 .section-tabs a { padding: 0.55rem 1rem; text-decoration: none; color: var(--color-text-muted); font-weight: var(--font-weight-semibold); border-bottom: 2px solid transparent; margin-bottom: -1px; }
