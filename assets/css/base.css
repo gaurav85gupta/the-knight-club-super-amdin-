@@ -945,6 +945,12 @@ progress {
 .badge-paid { background: var(--color-success-bg); color: var(--color-success-text); }
 .badge-refunded { background: var(--color-error-bg); color: var(--color-error-text-strong); }
 
+/* Sign-in method (Ui.authProviderBadge — students list/detail). Neutral
+   tones: this is informational, not a status to flag as good/bad. */
+.badge-signin-userid { background: var(--color-surface-sunken); color: var(--color-text-muted); }
+.badge-signin-email  { background: var(--color-info-bg); color: var(--color-info-text); }
+.badge-signin-google  { background: var(--color-success-bg); color: var(--color-success-text); }
+
 /* Section tab strip */
 .section-tabs { display: flex; gap: var(--space-2); margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); }
 .section-tabs a { padding: 0.55rem 1rem; text-decoration: none; color: var(--color-text-muted); font-weight: var(--font-weight-semibold); border-bottom: 2px solid transparent; margin-bottom: -1px; }

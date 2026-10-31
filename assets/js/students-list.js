@@ -77,7 +77,8 @@
     for (const s of items) {
       els.body.appendChild(Dom.el('tr', {}, [
         Dom.el('td', {}, [formatStudent(s)]),
-        Dom.el('td', { 'data-col': 'tertiary' }, [Dom.el('span', { class: 'order-id', text: s.userId })]),
+        Dom.el('td', { 'data-col': 'tertiary' }, [Dom.el('span', { class: 'order-id', text: s.userId || '—' })]),
+        Dom.el('td', { 'data-col': 'secondary' }, [Ui.authProviderBadge(s)]),
         Dom.el('td', { 'data-col': 'secondary', text: s.mobile || '—' }),
         Dom.el('td', {}, [Ui.statusBadge(s.status)]),
         Dom.el('td', { 'data-col': 'secondary', text: String(s.enrollmentCount) }),

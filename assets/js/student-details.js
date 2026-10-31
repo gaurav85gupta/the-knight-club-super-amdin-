@@ -77,7 +77,10 @@
     document.title = `${s.fullName} — The Knight Club Super Admin`;
 
     $('d-name').textContent = s.fullName;
-    $('d-userid').textContent = s.userId;
+    $('d-userid').textContent = s.userId || '—';
+    $('d-email').textContent = s.email ? `${s.email}${s.isEmailVerified ? '' : ' (unverified)'}` : '—';
+    Dom.clear($('d-signin'));
+    $('d-signin').appendChild(Ui.authProviderBadge(s));
     $('d-mobile').textContent = s.mobile || '—';
     $('d-state').textContent = s.state || '—';
 

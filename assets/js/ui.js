@@ -272,10 +272,39 @@ const Ui = (() => {
     return Dom.el('span', { class: 'badge badge-sm badge-kind-membership', text: '1% Club Member' });
   }
 
+  /**
+   * How a student signs in (Student.authProvider + userId/email presence —
+   * see Student.toSafeStudent on the backend). Three distinct cases:
+   *   - userId set, no email            -> "User ID" (legacy, pre-email-auth account)
+   *   - authProvider GOOGLE             -> "Google"
+   *   - authProvider LOCAL + email set  -> "Email" (covers a legacy account
+   *                                        that later added an email too —
+   *                                        userId may still be set, but the
+   *                                        account is reachable by email now)
+   * Never inferred beyond what the API actually returned — if authProvider
+   * is missing from the response (an older cached page, a DTO that hasn't
+   * been updated), this falls back to "User ID" rather than guessing.
+   */
+  function authProviderBadge(student) {
+    let label;
+    let kind;
+    if (student.authProvider === 'GOOGLE') {
+      label = 'Google';
+      kind = 'google';
+    } else if (student.email) {
+      label = 'Email';
+      kind = 'email';
+    } else {
+      label = 'User ID';
+      kind = 'userid';
+    }
+    return Dom.el('span', { class: `badge badge-sm badge-signin-${kind}`, text: label });
+  }
+
   return {
     confirm, notify, statusBadge, visibilityBadge, couponStateBadge, paymentStatusBadge,
     leadStatusBadge, stageBadge, ENQUIRY_TYPE_LABELS, messageForError, copyToClipboard,
-    kindBadge, sourceBadge, memberBadge,
+    kindBadge, sourceBadge, memberBadge, authProviderBadge,
   };
 })();
 
