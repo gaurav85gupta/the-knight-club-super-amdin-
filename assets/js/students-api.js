@@ -13,10 +13,11 @@
  *   POST /admin/students/:id/activate       no body
  *   POST /admin/students/:id/suspend        no body
  *   POST /admin/students/:id/reset-password  body: { newPassword }
+ *   POST /admin/students/:id/swap-course    body: { fromCourseId, toCourseId, reason? }
  *
- * WRITE ROUTES (activate/suspend) go through Api.post, which already sends
- * the CSRF marker on every non-GET request (api.js) — no extra wiring needed
- * here, same as CouponApi.activate/deactivate.
+ * WRITE ROUTES (activate/suspend/swap-course) go through Api.post, which
+ * already sends the CSRF marker on every non-GET request (api.js) — no
+ * extra wiring needed here, same as CouponApi.activate/deactivate.
  */
 
 const StudentApi = (() => {
@@ -43,5 +44,11 @@ const StudentApi = (() => {
     activate: (id) => Api.post(`${BASE}/${encodeURIComponent(id)}/activate`),
     suspend: (id) => Api.post(`${BASE}/${encodeURIComponent(id)}/suspend`),
     resetPassword: (id, newPassword) => Api.post(`${BASE}/${encodeURIComponent(id)}/reset-password`, { newPassword }),
+    swapCourse: (id, fromCourseId, toCourseId, reason) =>
+      Api.post(`${BASE}/${encodeURIComponent(id)}/swap-course`, {
+        fromCourseId,
+        toCourseId,
+        ...(reason && reason.trim() ? { reason: reason.trim() } : {}),
+      }),
   };
 })();

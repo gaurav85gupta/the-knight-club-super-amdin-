@@ -15,6 +15,13 @@
    the existing .badge-active from courses.css; SUSPENDED is new here). ---- */
 .badge-suspended { background: var(--color-error-bg); color: var(--color-error-text); }
 
+/* ---- Enrollment status badge — the REAL Enrollment.status enum (ACTIVE
+   reuses .badge-active from courses.css; REVOKED is new here, for the
+   course-swap feature — see adminEnrollment.service.js#swapEnrollment).
+   Same warning treatment as .badge-profile-incomplete (base.css), since
+   both mark "this still needs the admin's/student's attention" states. ---- */
+.badge-revoked { background: var(--color-warning-bg); color: var(--color-warning-text); }
+
 /* ---------------------------------------------------------------------------
    Password-reset modal (student-details.html)
    Reuses .modal-backdrop and .modal from base.css / auth.css where defined;

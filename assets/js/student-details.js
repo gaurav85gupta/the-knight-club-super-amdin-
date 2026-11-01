@@ -145,14 +145,127 @@
     }
     $('enrollments-empty').hidden = true;
     for (const e of items) {
+      // Swap only makes sense from an ACTIVE enrollment — a REVOKED row has
+      // nothing left to swap out of (see
+      // adminEnrollment.service.js#swapEnrollment's own ACTIVE precondition).
+      const actionCell = Dom.el('td', {}, []);
+      if (e.status === 'ACTIVE' && e.course) {
+        const swapBtn = Dom.el('button', { type: 'button', class: 'btn btn-outline btn-sm', text: 'Swap' });
+        swapBtn.addEventListener('click', () => openSwapModal(e));
+        actionCell.appendChild(swapBtn);
+      }
       body.appendChild(Dom.el('tr', {}, [
         Dom.el('td', {}, [e.course ? Dom.el('span', { text: e.course.title }) : Dom.el('span', { class: 'cell-sub', text: 'Deleted course' })]),
         Dom.el('td', {}, [Ui.sourceBadge(e.source)]),
         Dom.el('td', {}, [Ui.statusBadge(e.status)]),
         Dom.el('td', { text: Dom.formatDate(e.enrolledAt) }),
         Dom.el('td', { text: e.completedAt ? Dom.formatDate(e.completedAt) : '—' }),
+        actionCell,
       ]));
     }
+  }
+
+  /** Re-fetches and re-renders just the enrollments table after a swap. */
+  async function reloadEnrollments() {
+    try {
+      const data = await StudentApi.enrollments(studentId);
+      renderEnrollments(data.items);
+    } catch (err) {
+      fail(err);
+    }
+  }
+
+  /**
+   * Course-swap modal (adminEnrollment.service.js#swapEnrollment, via
+   * StudentApi.swapCourse — see students-api.js). Works identically whether
+   * this student is a 1% Club member or a regular buyer: `enrollment` is
+   * just the row being swapped OUT of; the dropdown lists every
+   * currently-published course (EnrollmentApi.courses(), the same selector
+   * the Enrollments admin page's own course filter already uses) MINUS the
+   * one being swapped out of, since swapping a course into itself is
+   * rejected by the backend anyway.
+   */
+  function openSwapModal(enrollment) {
+    const previouslyFocused = document.activeElement;
+    const titleId = `swap-title-${Date.now()}`;
+    const statusEl = Dom.el('p', { class: 'cell-sub', text: 'Loading courses…' });
+    const courseSelect = Dom.el('select', { class: 'input', 'aria-label': 'New course', disabled: true }, []);
+    const reasonInput = Dom.el('textarea', { class: 'input', maxlength: 500, rows: 2, 'aria-label': 'Reason (optional)' });
+
+    const cancelBtn = Dom.el('button', { type: 'button', class: 'btn btn-outline btn-sm', text: 'Cancel' });
+    const saveBtn = Dom.el('button', { type: 'button', class: 'btn btn-primary btn-sm', text: 'Swap course', disabled: true });
+
+    const modal = Dom.el('div', { class: 'modal editor-modal', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': titleId }, [
+      Dom.el('h3', { id: titleId, text: `Swap “${enrollment.course ? enrollment.course.title : 'this course'}”` }),
+      Dom.el('p', { text: 'This student will lose access to the current course and gain access to the one you pick below.' }),
+      Dom.el('div', { class: 'field' }, [
+        Dom.el('label', { text: 'New course' }),
+        statusEl,
+        courseSelect,
+      ]),
+      Dom.el('div', { class: 'field' }, [
+        Dom.el('label', { text: 'Reason (optional, visible to other admins)' }),
+        reasonInput,
+      ]),
+      Dom.el('div', { class: 'modal-actions' }, [cancelBtn, saveBtn]),
+    ]);
+    const backdrop = Dom.el('div', { class: 'modal-backdrop' }, [modal]);
+
+    let closed = false;
+    function close() {
+      if (closed) return;
+      closed = true;
+      document.removeEventListener('keydown', onKey);
+      backdrop.remove();
+      if (previouslyFocused && previouslyFocused.focus) previouslyFocused.focus();
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') close();
+    }
+    backdrop.addEventListener('mousedown', (e) => { if (e.target === backdrop) close(); });
+    document.addEventListener('keydown', onKey);
+    cancelBtn.addEventListener('click', close);
+    document.body.appendChild(backdrop);
+
+    // Load the course list, excluding the one being swapped out of.
+    EnrollmentApi.courses()
+      .then((data) => {
+        const options = (data.courses || []).filter((c) => c.id !== enrollment.course.id);
+        if (options.length === 0) {
+          statusEl.textContent = 'No other published courses are available to swap into.';
+          return;
+        }
+        Dom.clear(courseSelect);
+        for (const c of options) {
+          courseSelect.appendChild(Dom.el('option', { value: c.id, text: c.title }));
+        }
+        courseSelect.disabled = false;
+        saveBtn.disabled = false;
+        statusEl.hidden = true;
+        courseSelect.focus();
+      })
+      .catch(() => {
+        statusEl.textContent = 'Could not load the course list. Please close this and try again.';
+      });
+
+    let busy = false;
+    saveBtn.addEventListener('click', async () => {
+      if (busy || !courseSelect.value) return;
+      busy = true;
+      saveBtn.disabled = true;
+      cancelBtn.disabled = true;
+      try {
+        await StudentApi.swapCourse(studentId, enrollment.course.id, courseSelect.value, reasonInput.value);
+        close();
+        Forms.showAlert(alertEl, 'Course swapped successfully.', 'success');
+        await reloadEnrollments();
+      } catch (err) {
+        busy = false;
+        saveBtn.disabled = false;
+        cancelBtn.disabled = false;
+        if (fail(err)) return;
+      }
+    });
   }
 
   // ---- Purchase history --------------------------------------------------
