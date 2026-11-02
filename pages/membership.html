@@ -256,6 +256,74 @@
         </section>
 
         <!-- ================================================================
+             SECTION 2C — Hero Countdown Timer
+             ================================================================ -->
+        <section class="card membership-section" id="sec-countdown-wrap" aria-labelledby="sec-countdown">
+          <h3 id="sec-countdown" class="membership-section-title">Hero Countdown Timer</h3>
+          <p class="membership-section-hint">
+            Show a live countdown on the public 1% Club hero section. Nothing here is fixed —
+            set any label and any deadline you like (a launch offer, a festival sale, a
+            re-opened enrolment window, etc.) and the public page updates automatically with
+            no code changes. Save the plan first; countdown settings are saved separately.
+          </p>
+
+          <div class="field">
+            <div class="checkbox-field">
+              <input type="checkbox" id="cd-enabled" aria-describedby="cd-enabled-hint" />
+              <label for="cd-enabled">Show countdown on the public hero</label>
+            </div>
+            <p class="hint" id="cd-enabled-hint">When off, the hero shows no countdown at all.</p>
+          </div>
+
+          <div class="form-row" style="margin-top: var(--space-4);">
+            <div class="field">
+              <label for="cd-label">Countdown Label</label>
+              <input
+                class="input"
+                id="cd-label"
+                type="text"
+                maxlength="120"
+                placeholder="e.g. Limited Time Offer"
+                aria-describedby="cd-label-hint"
+              />
+              <p class="hint" id="cd-label-hint">Shown above the timer. Any text you like — rename it any time.</p>
+            </div>
+
+            <div class="field">
+              <label for="cd-ends-at">Ends At</label>
+              <input
+                class="input"
+                id="cd-ends-at"
+                type="datetime-local"
+                aria-describedby="cd-ends-at-hint cd-ends-at-error"
+              />
+              <p class="hint" id="cd-ends-at-hint">The deadline the public timer counts down to. Must be in the future to enable.</p>
+              <p class="field-error" id="cd-ends-at-error" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top: var(--space-2);">
+            <label for="cd-expired-text">Message After It Expires <span class="text-muted">(optional)</span></label>
+            <input
+              class="input"
+              id="cd-expired-text"
+              type="text"
+              maxlength="120"
+              placeholder="e.g. Offer closed — join the waitlist"
+            />
+            <p class="hint">Leave blank to simply hide the countdown once the deadline passes.</p>
+          </div>
+
+          <p class="field-error" id="cd-status-issue" role="alert" style="margin-top: var(--space-2);"></p>
+
+          <div class="action-bar" style="margin-top: var(--space-4); padding: 0; background: none; border: none; box-shadow: none;">
+            <button type="button" id="save-countdown-btn" class="btn btn-primary btn-sm">
+              <span class="label">Save Countdown Settings</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- ================================================================
              SECTION 3 — Course Configuration
              ================================================================ -->
         <section class="card membership-section" aria-labelledby="sec-courses">

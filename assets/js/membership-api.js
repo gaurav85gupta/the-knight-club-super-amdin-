@@ -102,6 +102,27 @@ const MembershipApi = (() => {
   }
 
   /**
+   * Get the plan's hero countdown configuration.
+   * @param {string} id
+   * @returns {Promise<{planId, planName, enabled, label, endsAt, expiredText, usable, issue}>}
+   */
+  function getCountdown(id) {
+    return Api.get(`${one(id)}/countdown`);
+  }
+
+  /**
+   * Update the plan's hero countdown configuration. Only `enabled`,
+   * `label`, `endsAt` and/or `expiredText` may be sent — the backend
+   * rejects any other field.
+   * @param {string} id
+   * @param {{enabled?: boolean, label?: string, endsAt?: string|null, expiredText?: string}} body
+   * @returns {Promise<object>}
+   */
+  function updateCountdown(id, body) {
+    return Api.patch(`${one(id)}/countdown`, body);
+  }
+
+  /**
    * Load all courses for the eligible-courses picker.
    * Uses the existing admin courses listing — limit=200, status=PUBLISHED.
    * Falls back to status=ALL if the query returns 0 results.
@@ -268,6 +289,8 @@ const MembershipApi = (() => {
     deactivatePlan,
     getPreBooking,
     updatePreBooking,
+    getCountdown,
+    updateCountdown,
     loadAllCourses,
     // Phase 39
     updateContent,

@@ -292,6 +292,8 @@
     if (window.__phase39 && window.__phase39.init) window.__phase39.init(p);
     // Phase 3: populate pre-booking section (no-op if Phase 3 not loaded).
     if (window.__phase3 && window.__phase3.init) window.__phase3.init(p);
+    // Hero countdown: populate countdown section (no-op if not loaded).
+    if (window.__countdown && window.__countdown.init) window.__countdown.init(p);
 
     if (nameInput)      nameInput.value       = p.name || '';
     if (slugInput)      slugInput.value       = p.slug || '';
@@ -1289,6 +1291,170 @@
 
   window.__phase3 = { init: populatePhase3, wireEvents: wirePhase3Events };
   wirePhase3Events();
+
+})(function getActivePlan() {
+  return window.__activePlan || null;
+});
+
+// =============================================================================
+// Hero Countdown Timer Configuration
+// Reads/writes GET+PATCH /admin/memberships/:id/countdown via
+// MembershipApi.getCountdown / updateCountdown. Saved separately from the
+// main plan form and from Pre-Booking — its own button, its own request.
+// Same pattern as the Pre-Booking section above.
+// =============================================================================
+
+(function initCountdown(getActivePlan) {
+  'use strict';
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  var enabledInput   = $('cd-enabled');
+  var labelInput     = $('cd-label');
+  var endsAtInput    = $('cd-ends-at');
+  var endsAtError    = $('cd-ends-at-error');
+  var expiredInput   = $('cd-expired-text');
+  var statusIssueEl  = $('cd-status-issue');
+  var saveBtn        = $('save-countdown-btn');
+  var sectionWrap    = $('sec-countdown-wrap');
+
+  function planId() {
+    var p = getActivePlan();
+    return p && (p.id || p._id);
+  }
+
+  function clearErrors() {
+    if (endsAtError) endsAtError.textContent = '';
+    if (statusIssueEl) statusIssueEl.textContent = '';
+  }
+
+  // The backend works in UTC ISO strings; <input type="datetime-local">
+  // works in the browser's local wall-clock time with no timezone suffix.
+  // These two converters keep that boundary in exactly one place.
+  function isoToLocalInputValue(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+      'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
+  function localInputValueToIso(value) {
+    if (!value) return null;
+    var d = new Date(value); // parsed as local time by the Date constructor
+    if (Number.isNaN(d.getTime())) return undefined; // sentinel: invalid
+    return d.toISOString();
+  }
+
+  /**
+   * Populates the section from a fresh GET of the countdown config —
+   * called after the plan loads/reloads, mirroring the Pre-Booking hook.
+   */
+  async function populateCountdown(plan) {
+    if (!sectionWrap) return;
+    var id = plan && (plan.id || plan._id);
+    if (!id) {
+      // No saved plan yet (new plan form): nothing to load.
+      if (enabledInput) enabledInput.checked = false;
+      if (labelInput) labelInput.value = '';
+      if (endsAtInput) endsAtInput.value = '';
+      if (expiredInput) expiredInput.value = '';
+      clearErrors();
+      return;
+    }
+
+    try {
+      var settings = await MembershipApi.getCountdown(id);
+      if (enabledInput) enabledInput.checked = settings.enabled === true;
+      if (labelInput) labelInput.value = settings.label || '';
+      if (endsAtInput) endsAtInput.value = isoToLocalInputValue(settings.endsAt);
+      if (expiredInput) expiredInput.value = settings.expiredText || '';
+      clearErrors();
+      if (statusIssueEl && settings.enabled && !settings.usable) {
+        statusIssueEl.textContent = 'Countdown is enabled but not currently usable: ' +
+          (settings.issue || 'the deadline is missing or invalid') + '. The public hero will show no countdown until this is fixed.';
+      }
+    } catch (err) {
+      if (typeof Auth !== 'undefined' && Auth.handleSessionError && Auth.handleSessionError(err)) return;
+      Ui.notify('Could not load countdown settings: ' + ((err && err.message) || 'Unknown error'), 'error');
+    }
+  }
+
+  async function saveCountdown() {
+    var id = planId();
+    if (!id) { Ui.notify('No active plan. Please save the plan first.', 'error'); return; }
+    if (!saveBtn) return;
+
+    clearErrors();
+
+    var enabled = !!(enabledInput && enabledInput.checked);
+    var label = (labelInput && labelInput.value.trim()) || '';
+    var expiredText = (expiredInput && expiredInput.value.trim()) || '';
+    var endsAtValue = (endsAtInput && endsAtInput.value) || '';
+
+    var body = { enabled: enabled, label: label, expiredText: expiredText };
+
+    var endsAtIso = localInputValueToIso(endsAtValue);
+    if (endsAtIso === undefined) {
+      if (endsAtError) endsAtError.textContent = 'Enter a valid date and time.';
+      return;
+    }
+    if (enabled && !endsAtIso) {
+      if (endsAtError) endsAtError.textContent = 'A deadline is required to enable the countdown.';
+      return;
+    }
+    if (enabled && endsAtIso && new Date(endsAtIso).getTime() <= Date.now()) {
+      if (endsAtError) endsAtError.textContent = 'The deadline must be in the future.';
+      return;
+    }
+    body.endsAt = endsAtIso; // may be null when clearing
+
+    var origLabel = saveBtn.textContent;
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving\u2026';
+
+    try {
+      var updated = await MembershipApi.updateCountdown(id, body);
+      // Reload persisted state from the response so the UI reflects exactly
+      // what the server stored (never assume the request body == saved state).
+      if (enabledInput) enabledInput.checked = updated.enabled === true;
+      if (labelInput) labelInput.value = updated.label || '';
+      if (endsAtInput) endsAtInput.value = isoToLocalInputValue(updated.endsAt);
+      if (expiredInput) expiredInput.value = updated.expiredText || '';
+      if (statusIssueEl) {
+        statusIssueEl.textContent = (updated.enabled && !updated.usable)
+          ? 'Countdown is enabled but not currently usable: ' + (updated.issue || 'the deadline is missing or invalid') + '.'
+          : '';
+      }
+      saveBtn.textContent = 'Saved \u2713';
+      setTimeout(function () {
+        saveBtn.textContent = origLabel;
+        saveBtn.disabled = false;
+      }, 2000);
+    } catch (err) {
+      saveBtn.textContent = origLabel;
+      saveBtn.disabled = false;
+      if (typeof Auth !== 'undefined' && Auth.handleSessionError && Auth.handleSessionError(err)) return;
+      var fieldMsg = err && err.errors && Array.isArray(err.errors)
+        ? (err.errors.find(function (d) { return d.field === 'endsAt'; }) || {}).message
+        : null;
+      if (fieldMsg && endsAtError) {
+        endsAtError.textContent = fieldMsg;
+      } else {
+        Ui.notify('Failed to save countdown settings: ' + ((err && err.message) || 'Unknown error'), 'error');
+      }
+    }
+  }
+
+  function wireCountdownEvents() {
+    if (saveBtn) saveBtn.addEventListener('click', saveCountdown);
+    if (endsAtInput) endsAtInput.addEventListener('input', clearErrors);
+    if (enabledInput) enabledInput.addEventListener('change', clearErrors);
+  }
+
+  window.__countdown = { init: populateCountdown, wireEvents: wireCountdownEvents };
+  wireCountdownEvents();
 
 })(function getActivePlan() {
   return window.__activePlan || null;
