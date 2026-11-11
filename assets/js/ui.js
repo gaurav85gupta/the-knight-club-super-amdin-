@@ -224,7 +224,15 @@ const Ui = (() => {
       case 404: return `That ${noun} could not be found. It may have been removed.`;
       case 409: return err.message || 'That conflicts with existing data.';
       case 413: return 'That request was too large.';
-      case 422: return err.message || 'Please correct the highlighted fields.';
+      case 422: {
+        // Field-level reasons written by the backend's own validation rules
+        // (client-safe by construction) — show them, de-duplicated.
+        const details = Array.isArray(err.errors)
+          ? [...new Set(err.errors.map((d) => d && d.message).filter(Boolean))]
+          : [];
+        if (details.length) return details.join(' ');
+        return err.message || 'Please correct the highlighted fields.';
+      }
       case 429: return 'Too many requests. Please wait a moment and try again.';
       default: return 'The server ran into a problem. Please try again shortly.';
     }

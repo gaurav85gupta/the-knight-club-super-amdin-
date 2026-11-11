@@ -790,7 +790,7 @@
       saveContentBtn.textContent = origLabel;
       saveContentBtn.disabled = false;
       if (typeof Auth !== 'undefined' && Auth.handleSessionError && Auth.handleSessionError(err)) return;
-      Ui.notify('Failed to save content: ' + ((err && err.message) || 'Unknown error'), 'error');
+      Ui.notify('Failed to save content: ' + Ui.messageForError(err, 'plan'), 'error');
     }
   }
 
@@ -1273,12 +1273,12 @@
       // Validation errors (422): show inline on the amount field when the
       // backend names it, otherwise fall back to a toast.
       var fieldMsg = err && err.errors && Array.isArray(err.errors)
-        ? (err.errors.find(function (d) { return d.field === 'amount'; }) || {}).message
+        ? (err.errors.find(function (d) { return d.field === 'amount' || d.field === 'preBooking.amount'; }) || {}).message
         : null;
       if (fieldMsg && amountError) {
         amountError.textContent = fieldMsg;
       } else {
-        Ui.notify('Failed to save pre-booking settings: ' + ((err && err.message) || 'Unknown error'), 'error');
+        Ui.notify('Failed to save pre-booking settings: ' + Ui.messageForError(err, 'plan'), 'error');
       }
     }
   }
@@ -1437,12 +1437,12 @@
       saveBtn.disabled = false;
       if (typeof Auth !== 'undefined' && Auth.handleSessionError && Auth.handleSessionError(err)) return;
       var fieldMsg = err && err.errors && Array.isArray(err.errors)
-        ? (err.errors.find(function (d) { return d.field === 'endsAt'; }) || {}).message
+        ? (err.errors.find(function (d) { return d.field === 'endsAt' || d.field === 'countdown.endsAt'; }) || {}).message
         : null;
       if (fieldMsg && endsAtError) {
         endsAtError.textContent = fieldMsg;
       } else {
-        Ui.notify('Failed to save countdown settings: ' + ((err && err.message) || 'Unknown error'), 'error');
+        Ui.notify('Failed to save countdown settings: ' + Ui.messageForError(err, 'plan'), 'error');
       }
     }
   }
